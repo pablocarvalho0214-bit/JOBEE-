@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { supabase } from '../services/supabaseClient';
 import BeeLogo from '../components/BeeLogo';
+import { LogoVerticalBars, LogoHexGrid, LogoMinimalBee } from '../components/LogoVariants';
 
 interface LoginPageProps {
   onLogin: () => void;
@@ -137,7 +138,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   return (
     <div className="flex min-h-screen w-full flex-col bg-secondary overflow-hidden max-w-md mx-auto shadow-2xl relative font-sans">
 
-      {/* 🖼️ FINAL GRADIENT BACKGROUNDS */}
+      {/* 🖼️ BACKGROUNDS */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none transition-all duration-1000">
         <div className={`absolute inset-0 transition-opacity duration-1000 ${isCandidate ? 'bg-gradient-to-br from-yellow-700 via-orange-950 to-black' : 'bg-gradient-to-br from-blue-900 via-indigo-950 to-black'}`}>
           {/* Subtle noise/texture for premium feel */}
@@ -152,7 +153,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
       <div className="flex flex-1 flex-col z-10 px-6 py-4 justify-center">
 
-        {/* Header - Ultra Compact */}
+        {/* Header - Showcase Mode */}
         <div className="flex flex-col items-center text-center mb-4">
           <div className="flex items-center gap-2 mb-1">
             <HiveIcon size={24} color={isCandidate ? "#facc15" : "#60a5fa"} />
@@ -161,12 +162,17 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             </span>
           </div>
           <p className="text-blue-100 text-[10px] font-bold uppercase tracking-widest opacity-90">
-            Onde talentos e empresas dão match
-          </p>
-          <p className="text-white/50 text-[9px] mt-1 italic">
-            {isCandidate ? 'Encontre sua colmeia' : 'Encontre suas abelhas'}
+            Sugestões de Novo Logo:
           </p>
         </div>
+
+        {/* LOGO SHOWCASE ROW */}
+        <div className="flex justify-around items-end bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/10 mb-6 animate-fade-in">
+          <LogoVerticalBars size={40} />
+          <LogoHexGrid size={40} />
+          <LogoMinimalBee size={40} />
+        </div>
+
 
         {/* Action Container */}
         <div className="w-full space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
