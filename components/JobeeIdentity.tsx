@@ -27,20 +27,19 @@ export const JobeeSymbol: React.FC<{ size?: number; mode?: 'light' | 'dark' | 'c
 
             {/* Side Bar Left - Company */}
             <rect
-                x="30" y="38" width="10" height="24" rx="2"
+                x="30" y="38" width="10" height="24" rx="5"
                 fill={mode === 'color' ? darkNavy : (mode === 'light' ? darkNavy : primaryColor)}
             />
 
             {/* Center Bar - Talent/Match (The Protagonsit) */}
             <rect
-                x="45" y="22" width="10" height="56" rx="2"
-                fill={mode === 'color' ? (mode === 'dark' ? primaryColor : "#854D0E") : (mode === 'light' ? primaryColor : white)}
-                className="animate-pulse"
+                x="45" y="22" width="10" height="56" rx="5"
+                fill={mode === 'color' ? darkNavy : (mode === 'light' ? primaryColor : white)}
             />
 
             {/* Side Bar Right - Opportunities */}
             <rect
-                x="60" y="38" width="10" height="24" rx="2"
+                x="60" y="38" width="10" height="24" rx="5"
                 fill={mode === 'color' ? darkNavy : (mode === 'light' ? darkNavy : primaryColor)}
             />
         </svg>
