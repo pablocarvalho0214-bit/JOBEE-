@@ -27,7 +27,7 @@ export const JobeeSymbol: React.FC<{ size?: number; mode?: 'light' | 'dark' | 'c
 
             {/* Side Bar Left - Company */}
             <rect
-                x="30" y="38" width="10" height="24" rx="5"
+                x="30" y="32" width="10" height="36" rx="5"
                 fill={mode === 'color' ? darkNavy : (mode === 'light' ? darkNavy : primaryColor)}
             />
 
@@ -39,7 +39,7 @@ export const JobeeSymbol: React.FC<{ size?: number; mode?: 'light' | 'dark' | 'c
 
             {/* Side Bar Right - Opportunities */}
             <rect
-                x="60" y="38" width="10" height="24" rx="5"
+                x="60" y="32" width="10" height="36" rx="5"
                 fill={mode === 'color' ? darkNavy : (mode === 'light' ? darkNavy : primaryColor)}
             />
         </svg>
