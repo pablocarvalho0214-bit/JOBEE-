@@ -188,7 +188,21 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ role = 'candidate', onNavigat
             <button onClick={handleLogout} className="relative z-10 w-full h-14 bg-red-500/10 text-red-400 border border-red-500/20 rounded-2xl flex items-center justify-center gap-2 active:scale-95 transition-all mt-auto mb-4">
                 <span className="material-symbols-outlined text-lg">logout</span><span className="text-[10px] font-black uppercase tracking-widest">Sair da Colmeia</span>
             </button>
-            <div className="flex justify-center items-center gap-2 py-2"><BeeLogo size={14} /><span className="text-[7px] font-black text-white/20 uppercase tracking-[0.4em]">v1.0.5 - Jobee</span></div>
+            <div
+                onClick={() => {
+                    const clock = (window as any)._brandClicks || 0;
+                    if (clock >= 4) {
+                        onNavigate?.('brand');
+                        (window as any)._brandClicks = 0;
+                    } else {
+                        (window as any)._brandClicks = clock + 1;
+                    }
+                }}
+                className="flex justify-center items-center gap-2 py-2 cursor-pointer active:opacity-50"
+            >
+                <BeeLogo size={14} />
+                <span className="text-[7px] font-black text-white/20 uppercase tracking-[0.4em]">v1.0.5 - Jobee</span>
+            </div>
 
             {/* Modals */}
             {showNotifications && (
@@ -254,10 +268,10 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ role = 'candidate', onNavigat
                                                 disabled={isCurrent || isDowngrade}
                                                 onClick={() => handleSubscribe(plan.url)}
                                                 className={`w-full h-12 rounded-xl font-black uppercase text-[11px] transition-all active:scale-95 ${isCurrent
-                                                        ? 'bg-white/5 text-white/20'
-                                                        : isDowngrade
-                                                            ? 'bg-white/5 text-white/10'
-                                                            : accentBg + ' text-secondary shadow-lg'
+                                                    ? 'bg-white/5 text-white/20'
+                                                    : isDowngrade
+                                                        ? 'bg-white/5 text-white/10'
+                                                        : accentBg + ' text-secondary shadow-lg'
                                                     }`}
                                             >
                                                 {isCurrent ? 'Ativo' : isDowngrade ? 'Bloqueado' : 'Assinar'}

@@ -1,5 +1,5 @@
 
-export type Page = 'login' | 'dashboard' | 'jobs' | 'swipe' | 'matches' | 'profile' | 'chat' | 'reset-password' | 'onboarding';
+export type Page = 'login' | 'dashboard' | 'jobs' | 'swipe' | 'matches' | 'profile' | 'chat' | 'reset-password' | 'onboarding' | 'brand';
 
 export interface Job {
   id: string;

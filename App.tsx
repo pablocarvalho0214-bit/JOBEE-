@@ -13,6 +13,7 @@ import CandidateDashboard from './pages/CandidateDashboard';
 import RecruiterOnboarding from './pages/RecruiterOnboarding';
 import CandidateOnboarding from './pages/CandidateOnboarding';
 import CreateJobPage from './pages/CreateJobPage';
+import BrandPage from './pages/BrandPage';
 import BottomNav from './components/BottomNav';
 import BeeLogo from './components/BeeLogo';
 import InstallPWAPrompt from './components/InstallPWAPrompt';
@@ -225,6 +226,8 @@ const App: React.FC = () => {
         );
       case 'profile':
         return <ProfilePage role={userRole} onNavigate={setCurrentPage} />;
+      case 'brand':
+        return <BrandPage onBack={() => setCurrentPage('login')} />;
       default:
         return (
           <div className="p-8 text-center bg-secondary text-white h-full flex flex-col items-center justify-center">
