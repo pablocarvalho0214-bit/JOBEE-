@@ -109,8 +109,8 @@ export const JobeeSymbolDiagonalBars: React.FC<{ size?: number; mode?: 'light' |
         <svg viewBox="0 0 100 100" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
             <path d="M50 5 L90 27.5 L90 72.5 L50 95 L10 72.5 L10 27.5 Z" fill={mode === 'dark' ? "none" : primary} stroke={mode === 'dark' ? primary : "none"} strokeWidth={mode === 'dark' ? "5" : "0"} />
 
-            {/* 3 Tilting Bars */}
-            <g transform="rotate(-15, 50, 50)">
+            {/* 3 Tilting Bars aligned with Hexagon edge (30 degrees) */}
+            <g transform="rotate(-30, 50, 50)">
                 <rect x="30" y="32" width="10" height="36" rx="5" fill={dark} />
                 <rect x="45" y="22" width="10" height="56" rx="5" fill={dark} />
                 <rect x="60" y="32" width="10" height="36" rx="5" fill={dark} />
