@@ -16,6 +16,7 @@ const CandidateDashboard: React.FC<CandidateDashboardProps> = ({ onNavigate, onO
         profileViews: 124
     });
     const [upcomingInterviews, setUpcomingInterviews] = useState<any[]>([]);
+    const [showNotifications, setShowNotifications] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -73,10 +74,10 @@ const CandidateDashboard: React.FC<CandidateDashboardProps> = ({ onNavigate, onO
                 <div className="flex items-center gap-3">
                     {/* Notification Bell */}
                     <button
-                        onClick={() => onNavigate('profile')}
-                        className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center relative active:scale-95 transition-all"
+                        onClick={() => setShowNotifications(!showNotifications)}
+                        className={`w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center relative active:scale-95 transition-all ${showNotifications ? 'border-primary/50 text-primary' : ''}`}
                     >
-                        <span className="material-symbols-outlined text-white/50 text-xl">notifications</span>
+                        <span className={`material-symbols-outlined ${showNotifications ? 'text-primary' : 'text-white/50'} text-xl`}>notifications</span>
                         {stats.pendingLikes > 0 && (
                             <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full border-2 border-secondary animate-pulse"></span>
                         )}
@@ -177,6 +178,56 @@ const CandidateDashboard: React.FC<CandidateDashboardProps> = ({ onNavigate, onO
                     </div>
                 </section>
             </div>
+
+            {showNotifications && (
+                <>
+                    <div className="fixed inset-0 z-[110] bg-black/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setShowNotifications(false)}></div>
+                    <div className="fixed top-24 right-6 w-80 max-h-[70vh] bg-[#121827] border border-white/10 rounded-[2rem] shadow-2xl z-[120] overflow-hidden flex flex-col animate-in slide-in-from-top-4 duration-300">
+                        <header className="p-5 border-b border-white/5 flex justify-between items-center bg-white/5">
+                            <h3 className="text-[10px] font-black uppercase tracking-widest text-primary">Notificações</h3>
+                            <button onClick={() => setShowNotifications(false)} className="material-symbols-outlined text-white/20 text-lg hover:text-white transition-colors">close</button>
+                        </header>
+                        <div className="flex-1 overflow-y-auto scrollbar-hide py-2">
+                            {upcomingInterviews.length > 0 ? (
+                                <div className="px-2 space-y-2">
+                                    <div
+                                        onClick={() => { onNavigate('matches'); setShowNotifications(false); }}
+                                        className="p-4 rounded-2xl bg-primary/5 border border-primary/10 flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-colors"
+                                    >
+                                        <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
+                                            <span className="material-symbols-outlined text-primary">event</span>
+                                        </div>
+                                        <div>
+                                            <p className="text-[11px] font-black text-white uppercase leading-tight">Entrevista Próxima</p>
+                                            <p className="text-[9px] font-bold text-white/40 mt-1 uppercase">Você tem {upcomingInterviews.length} entrevista(s) agendada(s). Não se atrase!</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="p-10 text-center opacity-30 flex flex-col items-center">
+                                    <span className="material-symbols-outlined text-4xl mb-3">notifications_off</span>
+                                    <p className="text-[9px] font-black uppercase tracking-widest leading-relaxed">Sua colmeia está<br />tranquila por enquanto.</p>
+                                </div>
+                            )}
+
+                            <div className="px-2 mt-2 pt-2 border-t border-white/5 space-y-2 opacity-60">
+                                <div className="p-4 rounded-2xl bg-white/5 border border-white/5 flex items-start gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+                                        <span className="material-symbols-outlined text-white/30">auto_awesome</span>
+                                    </div>
+                                    <div>
+                                        <p className="text-[11px] font-black text-white/50 uppercase leading-tight">Dica de Perfil</p>
+                                        <p className="text-[9px] font-bold text-white/20 mt-1 uppercase">Perfis com foto completa e bio detalhada ganham 3x mais matches.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <footer className="p-4 bg-white/[0.02] border-t border-white/5">
+                            <button className="w-full py-2 text-[8px] font-black uppercase tracking-widest text-white/20 hover:text-primary transition-colors">Limpar Tudo</button>
+                        </footer>
+                    </div>
+                </>
+            )}
         </div>
     );
 };

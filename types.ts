@@ -34,6 +34,9 @@ export interface Job {
   availabilitySlots?: string[];
   is_sponsored?: boolean;
   priority_level?: number;
+  benefitsValues?: Record<string, number>;
+  totalRemuneration?: string;
+  showRemuneration?: boolean;
 }
 
 export interface Candidate {

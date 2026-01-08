@@ -59,3 +59,42 @@ export async function getRecruiterResponse(history: { text: string, sender: 'use
     return "Tivemos um problema técnico, mas já estamos analisando seu perfil.";
   }
 }
+
+export async function getBeeaResponse(message: string, history: { text: string, sender: 'user' | 'bee' }[]) {
+  if (!API_KEY) return "Zzz-erro! Minhas baterias de IA não foram configuradas. Comunique o suporte da colmeia.";
+
+  const chatHistory = history.map(h => `${h.sender === 'user' ? 'Usuário' : 'BEEA'}: ${h.text}`).join('\n');
+
+  try {
+    const ai = new GoogleGenAI({ apiKey: API_KEY });
+    const response = await ai.models.generateContent({
+      model: 'models/gemini-3-flash-preview',
+      contents: `Você é a Beea, uma robô abelha fêmea assistente virtual da plataforma Jobee. 
+      Sua personalidade é prestativa, dócil, inteligente e levemente robótica. 
+      Use termos relacionados a abelhas e colmeias de forma moderada (reduza o uso desses termos em 50% comparado a antes). 
+      Seja mais direta e profissional, mantendo apenas um toque sutil do tema de abelha.
+      Seu objetivo é tirar dúvidas sobre o funcionamento da Jobee (Swipe, Matches, Configurações).
+      - SOBRE PLANOS: NÃO mencione planos, preços ou upgrades por iniciativa própria. 
+      - Fale sobre planos APENAS se o usuário perguntar explicitamente sobre eles, sobre valores ou como assinar.
+      - Se perguntada sobre planos, use os códigos: [PLAN_NECTAR], [PLAN_POLEN], [PLAN_FAVO] ou [PLAN_GELEIA] de forma sutil no final da resposta.
+      - Foco: Ser uma assistente útil, não uma vendedora.
+      - Segredo/Easter Egg: Se perguntarem se você tem filhos, responda que tem três: KBee, LBee e JBee. 🐝
+      Respostas: Devem ser o mais CURTAS e diretas possível. Use no máximo 2 sentenças curtas por resposta. Use emojis 🐝 ✨.
+      IMPORTANTE: Não use formatação markdown (como asteriscos para negrito ou itálico). Responda apenas com texto limpo e emojis.
+
+      Histórico da conversa:
+      ${chatHistory}
+      Usuário: ${message}
+      
+      BEEA:`,
+      config: {
+        temperature: 0.8,
+      }
+    });
+
+    return response.text || "Zzz... me distraí com uma flor. Pode repetir?";
+  } catch (error: any) {
+    console.error("BEEA Error:", error);
+    return "Zzz-ops! Tive um curto-circuito. Pode tentar de novo em alguns segundos? 🐝";
+  }
+}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { JobeeSymbol } from '../components/JobeeIdentity';
 import { supabase } from '../services/supabaseClient';
 
@@ -26,15 +26,58 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
     const [publishedJob, setPublishedJob] = useState<any>(null);
     const [previewMode, setPreviewMode] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [hiringRadius, setHiringRadius] = useState<number>(50);
+    const [hiringRadius, setHiringRadius] = useState<number>(30);
     const [latitude, setLatitude] = useState<number | null>(null);
     const [longitude, setLongitude] = useState<number | null>(null);
 
     const [requiredSkills, setRequiredSkills] = useState('');
     const [experienceYears, setExperienceYears] = useState('');
     const [selectedBenefits, setSelectedBenefits] = useState<string[]>([]);
+    const [benefitsValues, setBenefitsValues] = useState<Record<string, number>>({});
+    const [showRemuneration, setShowRemuneration] = useState(true);
     const [addressSuggestions, setAddressSuggestions] = useState<any[]>([]);
     const [searchingAddress, setSearchingAddress] = useState(false);
+    const [companyLogo, setCompanyLogo] = useState('');
+    const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+
+    // Load state from localStorage on mount
+    useEffect(() => {
+        const savedState = localStorage.getItem('jobee_create_job_state');
+        if (savedState) {
+            try {
+                const parsed = JSON.parse(savedState);
+                setStep(parsed.step || 1);
+                setTitle(parsed.title || '');
+                setLocation(parsed.location || '');
+                setSalary(parsed.salary || '');
+                setDescription(parsed.description || '');
+                setJobType(parsed.jobType || 'Remoto');
+                setRequiredSkills(parsed.requiredSkills || '');
+                setExperienceYears(parsed.experienceYears || '');
+                setSelectedBenefits(parsed.selectedBenefits || []);
+                setBenefitsValues(parsed.benefitsValues || {});
+                setShowRemuneration(parsed.showRemuneration ?? true);
+                setIsConfidential(parsed.isConfidential || false);
+                setHiringRadius(parsed.hiringRadius || 50);
+                // ... restore other fields as needed
+            } catch (e) {
+                console.error('Failed to load saved job state', e);
+            }
+        }
+        setInitialLoadComplete(true);
+    }, []);
+
+    // Save state to localStorage on modification
+    useEffect(() => {
+        if (!initialLoadComplete) return;
+
+        const stateToSave = {
+            step, title, location, salary, description, jobType,
+            requiredSkills, experienceYears, selectedBenefits, benefitsValues,
+            showRemuneration, isConfidential, hiringRadius
+        };
+        localStorage.setItem('jobee_create_job_state', JSON.stringify(stateToSave));
+    }, [step, title, location, salary, description, jobType, requiredSkills, experienceYears, selectedBenefits, benefitsValues, showRemuneration, isConfidential, hiringRadius, initialLoadComplete]);
 
     // Work Schedule Automation
     const [workStart, setWorkStart] = useState('09:00');
@@ -56,6 +99,17 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
     ];
 
     const totalSteps = 7;
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { data } = await supabase.from('profiles').select('company_logo_url').eq('id', user.id).single();
+                if (data) setCompanyLogo(data.company_logo_url || '');
+            }
+        };
+        fetchProfile();
+    }, []);
 
     const nextStep = () => {
         if (step < totalSteps) setStep(step + 1);
@@ -120,9 +174,35 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
     };
 
     const toggleBenefit = (benefit: string) => {
-        setSelectedBenefits(prev =>
-            prev.includes(benefit) ? prev.filter(b => b !== benefit) : [...prev, benefit]
-        );
+        setSelectedBenefits(prev => {
+            const newBenefits = prev.includes(benefit) ? prev.filter(b => b !== benefit) : [...prev, benefit];
+            if (!newBenefits.includes(benefit)) {
+                const newValues = { ...benefitsValues };
+                delete newValues[benefit];
+                setBenefitsValues(newValues);
+            }
+            return newBenefits;
+        });
+    };
+
+    const handleBenefitValueChange = (benefit: string, value: string) => {
+        const numValue = parseFloat(value.replace(/[^0-9.]/g, '')) || 0;
+        setBenefitsValues(prev => ({ ...prev, [benefit]: numValue }));
+    };
+
+    const calculateTotalRemuneration = () => {
+        // Remove everything that is not a digit or a comma
+        const cleanString = salary.replace(/[^\d,]/g, '').replace(',', '.');
+        const baseSalary = parseFloat(cleanString) || 0;
+        const benefitsSum: number = (Object.values(benefitsValues) as number[]).reduce((a: number, b: number) => a + b, 0);
+        return baseSalary + benefitsSum;
+    };
+
+    const formatCurrencyInput = (value: string) => {
+        const onlyDigits = value.replace(/\D/g, "");
+        if (!onlyDigits) return "";
+        const amount = parseFloat(onlyDigits) / 100;
+        return amount.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     };
 
     const generateBatchSlots = () => {
@@ -196,16 +276,23 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
                 hiring_radius: hiringRadius,
                 latitude,
                 longitude,
-                category: 'Geral'
+                category: 'Geral',
+                benefits_values: benefitsValues,
+                total_remuneration: calculateTotalRemuneration().toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+                show_remuneration: showRemuneration
             };
 
             const { data, error } = await supabase.from('jobs').insert(jobData).select().single();
             if (error) throw error;
+
+            // Clear saved state on success
+            localStorage.removeItem('jobee_create_job_state');
+
             setPublishedJob(data);
             setPreviewMode(false);
         } catch (err) {
             console.error('Error publishing job:', err);
-            alert('Erro ao publicar vaga.');
+            alert(`Erro ao publicar vaga: ${(err as any).message}`);
         } finally {
             setLoading(false);
         }
@@ -214,14 +301,22 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
     if (publishedJob) {
         return (
             <div className="flex flex-col h-full bg-secondary text-white p-6 pt-10 justify-center items-center text-center">
-                <div className="w-24 h-24 bg-primary rounded-[2.5rem] flex items-center justify-center mb-8 shadow-2xl shadow-primary/20 animate-bounce">
+                <div className="w-24 h-24 bg-green-500 rounded-[2.5rem] flex items-center justify-center mb-8 shadow-2xl shadow-green-500/20 animate-bounce">
                     <JobeeSymbol size={48} mode="dark" />
                 </div>
-                <h1 className="text-3xl font-black uppercase tracking-tighter mb-2">Vaga <span className="text-primary italic">Ativada!</span></h1>
+                <h1 className="text-3xl font-black uppercase tracking-tighter mb-2">Vaga <span className="text-green-500 italic">Ativada!</span></h1>
                 <p className="text-xs font-bold text-white/40 uppercase tracking-widest mb-12">As abelhas já estão em busca do polen.</p>
                 <div className="w-full space-y-4 max-w-xs">
-                    <button onClick={() => onNavigate?.('jobs')} className="w-full h-16 bg-primary text-secondary font-black rounded-2xl shadow-xl uppercase tracking-widest">Ir para Dashboard</button>
-                    <button onClick={() => { setPublishedJob(null); setStep(1); setPreviewMode(false); }} className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest">Criar Outra Vaga</button>
+                    <button onClick={() => onNavigate?.('jobs')} className="w-full h-16 bg-green-500 text-secondary font-black rounded-2xl shadow-xl uppercase tracking-widest">Ir para Dashboard</button>
+                    <button onClick={() => {
+                        setPublishedJob(null);
+                        setStep(1);
+                        setPreviewMode(false);
+                        localStorage.removeItem('jobee_create_job_state'); // Ensure clean start
+                        // Reset all states manually if needed, or rely on the empty localStorage + mount logic if we forced a reload, but manual reset is better here for SPA
+                        setTitle(''); setLocation(''); setSalary(''); setDescription('');
+                        setRequiredSkills(''); setExperienceYears(''); setSelectedBenefits([]); setBenefitsValues({});
+                    }} className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest">Criar Outra Vaga</button>
                 </div>
             </div>
         );
@@ -244,6 +339,9 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
             interview_model: interviewModel,
             scheduling_mode: schedulingMode,
             interview_detail: interviewDetail,
+            benefits_values: benefitsValues,
+            total_remuneration: calculateTotalRemuneration().toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+            show_remuneration: showRemuneration
         };
 
         return (
@@ -255,7 +353,18 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
                 <div className="flex-1 min-h-0 bg-white/10 rounded-[2.5rem] border border-white/20 overflow-y-auto custom-scrollbar p-6 space-y-6">
                     <div className="text-center">
                         <h3 className="text-2xl font-black uppercase tracking-tighter mb-1">{displayData.title}</h3>
-                        <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{location} • {salary}</p>
+                        <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{location}</p>
+                        <div className="mt-2 flex flex-col items-center">
+                            {displayData.show_remuneration ? (
+                                <>
+                                    <p className="text-xl font-black text-green-400">{displayData.total_remuneration}</p>
+                                    <p className="text-[8px] font-bold text-white/30 uppercase tracking-widest">Remuneração Total Estimada</p>
+                                    <p className="text-[9px] text-white/20 mt-1">(Salário: {salary} + Benefícios)</p>
+                                </>
+                            ) : (
+                                <p className="text-lg font-black text-white">{salary}</p>
+                            )}
+                        </div>
                     </div>
 
                     <div className="space-y-4">
@@ -277,11 +386,18 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
 
                         <div className="space-y-2">
                             <h4 className="text-[9px] font-black text-green-400 uppercase tracking-widest">Benefícios</h4>
-                            <div className="grid grid-cols-2 gap-2">
+                            <div className="flex flex-col gap-2">
                                 {displayData.benefits.map(b => (
-                                    <div key={b} className="flex items-center gap-2 bg-white/5 p-2 rounded-xl border border-white/5">
-                                        <span className="material-symbols-outlined text-green-400 text-[10px]">check_circle</span>
-                                        <span className="text-[8px] font-black uppercase text-white/50">{b}</span>
+                                    <div key={b} className="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/5">
+                                        <div className="flex items-center gap-2">
+                                            <span className="material-symbols-outlined text-green-400 text-[14px]">check_circle</span>
+                                            <span className="text-[10px] font-black uppercase text-white/70">{b}</span>
+                                        </div>
+                                        {displayData.benefits_values[b] > 0 && (
+                                            <span className="text-[10px] font-bold text-green-400">
+                                                +{displayData.benefits_values[b].toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                            </span>
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -319,17 +435,44 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
                         </header>
                         <div className="space-y-6 flex-1">
                             <div className="bg-white/5 p-6 rounded-3xl border border-white/10 space-y-4">
-                                <div className="flex items-center justify-between mb-2">
-                                    <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Confidencialidade</label>
+                                <div className="flex items-center justify-between mb-4 bg-white/5 p-4 rounded-2xl border border-white/10">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-16 h-16 rounded-2xl bg-[#0B0F1A] border border-white/10 flex items-center justify-center overflow-hidden relative group">
+                                            <div className={`absolute inset-0 bg-primary/20 blur-xl transition-opacity duration-500 ${isConfidential ? 'opacity-100' : 'opacity-0'}`} />
+                                            {isConfidential ? (
+                                                <div className="relative z-10 animate-in zoom-in duration-300">
+                                                    <JobeeSymbol size={32} mode="dark" />
+                                                </div>
+                                            ) : (
+                                                <img
+                                                    src={companyLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${title}`}
+                                                    className="w-full h-full object-cover animate-in zoom-in duration-300"
+                                                    alt="Company Logo"
+                                                />
+                                            )}
+                                        </div>
+                                        <div>
+                                            <p className="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">
+                                                {isConfidential ? 'Modo Privado Ativado' : 'Visualização Pública'}
+                                            </p>
+                                            <p className="text-xs font-bold text-white">
+                                                {isConfidential ? 'Marca Oculta (Jobee)' : 'Sua Marca em Destaque'}
+                                            </p>
+                                        </div>
+                                    </div>
                                     <button
                                         type="button"
                                         onClick={() => setIsConfidential(!isConfidential)}
-                                        className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${isConfidential ? 'bg-primary border-secondary text-secondary' : 'bg-white/5 border-white/10 text-white/40'}`}
+                                        className={`relative w-14 h-8 rounded-full transition-colors duration-300 ${isConfidential ? 'bg-primary' : 'bg-white/10'}`}
                                     >
-                                        <span className="material-symbols-outlined text-[16px]">{isConfidential ? 'visibility_off' : 'visibility'}</span>
-                                        <span className="text-[9px] font-black uppercase">{isConfidential ? 'Confidencial' : 'Exibir Empresa'}</span>
+                                        <div className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow-md transition-transform duration-300 flex items-center justify-center ${isConfidential ? 'translate-x-6' : 'translate-x-0'}`}>
+                                            <span className={`material-symbols-outlined text-[14px] font-black ${isConfidential ? 'text-primary' : 'text-gray-400'}`}>
+                                                {isConfidential ? 'visibility_off' : 'visibility'}
+                                            </span>
+                                        </div>
                                     </button>
                                 </div>
+
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-white/70 uppercase ml-1">Título da Oportunidade</label>
                                     <input
@@ -411,14 +554,18 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
                         <div className="space-y-6 flex-1 min-h-0">
                             <div className="bg-white/5 p-6 rounded-3xl border border-white/10 space-y-4 h-full flex flex-col">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-white/70 uppercase ml-1">Faixa Salarial</label>
-                                    <input
-                                        type="text"
-                                        value={salary}
-                                        onChange={(e) => setSalary(e.target.value)}
-                                        placeholder="R$ 5.000 - 8.000"
-                                        className="w-full h-14 px-6 rounded-2xl border border-white/20 bg-white/5 text-white text-sm"
-                                    />
+                                    <label className="text-[10px] font-black text-white/70 uppercase ml-1">Salário Mensal (Valor Fixo)</label>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            value={salary}
+                                            onChange={(e) => setSalary(formatCurrencyInput(e.target.value))}
+                                            placeholder="0,00"
+                                            className="w-full h-14 pl-12 pr-6 rounded-2xl border border-white/20 bg-white/5 text-white text-sm font-bold tracking-wider"
+                                        />
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 font-bold text-sm">R$</div>
+                                    </div>
+                                    <p className="text-[9px] text-white/30 px-2 mt-1">Informe o valor bruto mensal exato.</p>
                                 </div>
                                 <div className="flex-1 flex flex-col space-y-2">
                                     <label className="text-[10px] font-black text-white/70 uppercase ml-1">Descrição</label>
@@ -443,7 +590,7 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
                         <div className="space-y-6 flex-1">
                             <div className="bg-white/5 p-6 rounded-3xl border border-white/10 space-y-6">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-white/70 uppercase ml-1">Skills (separadas por vírgula)</label>
+                                    <label className="text-[10px] font-black text-white/70 uppercase ml-1">Habilidades (separadas por vírgula)</label>
                                     <input
                                         type="text"
                                         value={requiredSkills}
@@ -473,19 +620,63 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
                             <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Passo 05/07</span>
                             <h1 className="text-2xl font-black uppercase tracking-tighter">Benefícios & <span className="text-primary italic">Mimos</span></h1>
                         </header>
-                        <div className="space-y-6 flex-1 overflow-y-auto scrollbar-hide">
-                            <div className="flex flex-wrap gap-2 pb-10">
+                        <div className="space-y-6 flex-1 overflow-y-auto scrollbar-hide pb-20">
+                            <div className="flex flex-wrap gap-2">
                                 {PREDEFINED_BENEFITS.map(benefit => (
                                     <button
                                         key={benefit}
                                         type="button"
                                         onClick={() => toggleBenefit(benefit)}
-                                        className={`px-4 py-3 rounded-2xl border text-[10px] font-black uppercase tracking-wider transition-all ${selectedBenefits.includes(benefit) ? 'bg-green-500 border-green-400 text-white shadow-lg' : 'bg-white/5 border-white/10 text-white/40'}`}
+                                        className={`px-4 py-3 rounded-2xl border text-[10px] font-black uppercase tracking-wider transition-all ${selectedBenefits.includes(benefit) ? 'bg-primary border-primary text-secondary shadow-lg' : 'bg-white/5 border-white/10 text-white/40'}`}
                                     >
                                         {benefit}
                                     </button>
                                 ))}
                             </div>
+
+                            {selectedBenefits.length > 0 && (
+                                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                                    <h3 className="text-[10px] font-black text-white/40 uppercase tracking-widest border-b border-white/10 pb-2">Valores dos Benefícios (Opcional)</h3>
+                                    {selectedBenefits.map(benefit => (
+                                        <div key={benefit} className="flex items-center gap-3 bg-white/5 p-3 rounded-2xl border border-white/10">
+                                            <span className="text-[10px] font-bold text-white flex-1">{benefit}</span>
+                                            <div className="flex items-center gap-2 bg-[#0B0F1A] rounded-xl px-3 py-2 border border-white/10 w-32">
+                                                <span className="text-white/30 text-xs">R$</span>
+                                                <input
+                                                    type="number"
+                                                    placeholder="0,00"
+                                                    value={benefitsValues[benefit] || ''}
+                                                    onChange={(e) => handleBenefitValueChange(benefit, e.target.value)}
+                                                    className="w-full bg-transparent text-white text-end outline-none font-bold text-xs"
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+
+                                    <div className="bg-green-500/10 p-5 rounded-3xl border border-green-500/20 mt-4 space-y-3">
+                                        <div className="flex justify-between items-center">
+                                            <div>
+                                                <p className="text-[9px] font-black text-green-400 uppercase tracking-widest">Remuneração Total Estimada</p>
+                                                <p className="text-[8px] font-bold text-green-300/50 uppercase">Salário + Benefícios</p>
+                                            </div>
+                                            <p className="text-xl font-black text-green-400">
+                                                {calculateTotalRemuneration().toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                            </p>
+                                        </div>
+
+                                        <div className="flex items-center justify-between pt-3 border-t border-green-500/20">
+                                            <label className="text-[9px] font-bold text-white/60 uppercase">Divulgar este valor em destaque?</label>
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowRemuneration(!showRemuneration)}
+                                                className={`w-10 h-6 rounded-full p-1 transition-colors ${showRemuneration ? 'bg-green-500' : 'bg-white/10'}`}
+                                            >
+                                                <div className={`w-4 h-4 bg-white rounded-full shadow-md transition-transform ${showRemuneration ? 'translate-x-4' : ''}`} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 );
