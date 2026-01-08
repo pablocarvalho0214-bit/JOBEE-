@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobee - 20 Logo Concepts Lab</title>
+    <style>
+        :root {
+            --primary: #FFD700;
+            --bg: #0B0F1A;
+            --card-bg: #151922;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-weight: 900;
+            letter-spacing: -2px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #94A3B8;
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .icon {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 15px;
+        }
+
+        .label {
+            font-weight: 600;
+            color: #E2E8F0;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .desc {
+            color: #64748B;
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>JOBEE LOGO LAB</h1>
+    <p>20 Concept Explorations. Click any card to visualize it as the main app icon.</p>
+
+    <div class="grid">
+        <!-- 1. The Hive Link -->
+        <div class="card">
+            <svg class="icon" viewBox="0 0 100 100">
+                <path d="M30 50 L50 20 L70 50 L50 80 Z" stroke="#FFD700" stroke-width="8" fill="none"
+                    stroke-linejoin="round" />
+                <circle cx="50" cy="50" r="10" fill="#FFD700" />
+            </svg>
+            <div class="label">1. Hive Link</div>
+            <div class="desc">Minimal geometric connection.</div>
+        </div>
+
+        <!-- 2. Speed Bolt -->
+        <div class="card">
+            <svg class="icon" viewBox="0 0 100 100">
+                <path d="M55 10 L25 55 L45 55 L35 90 L85 35 L65 35 L75 10 Z" fill="#FFD700" />
+            </svg>
+            <div class="label">2. Speed Bolt</div>
+            <div class="desc">Classic fast energy symbol.</div>
+        </div>
+
+        <!-- 3. Tech Node -->
+        <div class="card">
+            <svg class="icon" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="20" stroke="#FFD700" stroke-width="4" fill="none" />
+                <line x1="50" y1="20" x2="50" y2="30" stroke="#FFD700" stroke-width="4" />
+                <line x1="50" y1="70" x2="50" y2="80" stroke="#FFD700" stroke-width="4" />
+                <line x1="20" y1="50" x2="30" y2="50" stroke="#FFD700" stroke-width="4" />
+                <line x1="70" y1="50" x2="80" y2="50" stroke="#FFD700" stroke-width="4" />
+            </svg>
+            <div class="label">3. Tech Node</div>
+            <div class="desc">Cybernetic circuitry focus.</div>
+        </div>
+
+        <!-- 4. The J-Wing -->
+        <div class="card">
+            <svg class="icon" viewBox="0 0 100 100">
+                <path d="M40 20 Q80 20 80 60 Q80 90 50 90 L40 90 L40 20 Z" fill="#FFD700" opacity="0.8" />
+                <path d="M20 50 Q50 50 50 70 L20 70 Z" fill="#FFD700" />
+            </svg>
+            <div class="label">4. The J-Wing</div>
+            <div class="desc">Letter J forming a wing.</div>
+        </div>
+
+        <!-- 5. Search Comb -->
+        <div class="card">
+            <svg class="icon" viewBox="0 0 100 100">
+                <circle cx="45" cy="45" r="25" stroke="#FFD700" stroke-width="8" fill="none" />
+                <line x1="65" y1="65" x2="85" y2="85" stroke="#FFD700" stroke-width="8" stroke-linecap="round" />
+            </svg>
+            <div class="label">5. Search Comb</div>
+            <div class="desc">Finding the right match.</div>
+        </div>
+
+        <!-- 6. Happy Bee -->
+        <div class="card">
+            <svg class="icon" viewBox="0 0 100 100">
+                <rect x="25" y="25" width="50" height="50" rx="15" fill="#FFD700" />
+                <path d="M35 45 L45 45 M55 45 L65 45" stroke="#000" stroke-width="4" />
+                <path d="M40 65 Q50 75 60 65" stroke="#000" stroke-width="4" fill="none" />
+            </svg>
+            <div class="label">6. Happy Bee</div>
+            <div class="desc">Friendly, approachable mascot.</div>
+        </div>
+
+        <!-- 7. Abstract Flame -->
+        <div class="card">
+            <svg class="icon" viewBox="0 0 100 100">
+                <path d="M50 10 Q90 50 50 90 Q10 50 50 10" fill="#FFD700" />
+                <circle cx="50" cy="70" r="10" fill="#000" />
+            </svg>
+            <div class="label">7. Abstract Flame</div>
+            <div class="desc">Simplified burning passion.</div>
+        </div>
+
+        <!-- 8. Crown Job -->
+        <div class="card">
+            <svg class="icon" viewBox="0 0 100 100">
+                <path d="M20 70 L20 40 L40 60 L60 20 L80 70 Z" fill="#FFD700" />
+            </svg>
+            <div class="label">8. Queen's Crown</div>
+            <div class="desc">Premium, best-in-class jobs.</div>
+        </div>
+
+        <!-- 9. Radar Pulse -->
+        <div class="card">
+            <svg class="icon" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="10" fill="#FFD700" />
+                <circle cx="50" cy="50" r="25" stroke="#FFD700" stroke-width="3" fill="none" opacity="0.6" />
+                <circle cx="50" cy="50" r="40" stroke="#FFD700" stroke-width="2" fill="none" opacity="0.3" />
+            </svg>
+            <div class="label">9. Radar Pulse</div>
+            <div class="desc">Scanning for opportunities.</div>
+        </div>
+
+        <!-- 10. Handshake Hex -->
+        <div class="card">
+            <svg class="icon" viewBox="0 0 100 100">
+                <path d="M20 50 L50 80 L80 50" stroke="#FFD700" stroke-width="10" fill="none" stroke-linecap="round" />
+                <path d="M50 20 L50 80" stroke="#FFD700" stroke-width="4" />
+            </svg>
+            <div class="label">10. Arrow Check</div>
+            <div class="desc">Success, selection, done.</div>
+        </div>
+
+        <!-- 11. Infinity Wings -->
+        <div class="card">
+            <svg class="icon" viewBox="0 0 100 100">
+                <path d="M20 50 C20 30 50 30 50 50 C50 70 80 70 80 50 C80 30 50 30 50 50 C50 70 20 70 20 50"
+                    stroke="#FFD700" stroke-width="8" fill="none" />
+            </svg>
+            <div class="label">11. Infinity Job</div>
+            <div class="desc">Endless possibilities.</div>
+        </div>
+
+        <!-- 12. Pixel Bee -->
+        <div class="card">
+            <svg class="icon" viewBox="0 0 100 100">
+                <rect x="30" y="40" width="10" height="10" fill="#FFD700" />
+                <rect x="40" y="40" width="10" height="10" fill="#000" />
+                <rect x="50" y="40" width="10" height="10" fill="#FFD700" />
+                <rect x="60" y="40" width="10" height="10" fill="#000" />
+                <rect x="40" y="30" width="20" height="10" fill="#FFD700" />
+                <rect x="40" y="50" width="20" height="10" fill="#FFD700" />
+            </svg>
+            <div class="label">12. Pixel Art</div>
+            <div class="desc">Retro, digital native feel.</div>
+        </div>
+
+        <!-- 13. Map Marker -->
+        <div class="card">
+            <svg class="icon" viewBox="0 0 100 100">
+                <path d="M50 10 C30 10 20 30 20 45 C20 70 50 90 50 90 C50 90 80 70 80 45 C80 30 70 10 50 10 Z"
+                    fill="#FFD700" />
+                <circle cx="50" cy="40" r="12" fill="#000" />
+            </svg>
+            <div class="label">13. Location Drop</div>
+            <div class="desc">Local jobs focus.</div>
+        </div>
+
+        <!-- 14. Fingerprint -->
+        <div class="card">
+            <svg class="icon" viewBox="0 0 100 100">
+                <path d="M30 80 C30 50 70 50 70 80 M40 80 C40 60 60 60 60 80 M50 20 L50 40" stroke="#FFD700"
+                    stroke-width="6" fill="none" stroke-linecap="round" />
+            </svg>
+            <div class="label">14. Identity ID</div>
+            <div class="desc">Unique match for you.</div>
+        </div>
+
+        <!-- 15. The Rocket -->
+        <div class="card">
+            <svg class="icon" viewBox="0 0 100 100">
+                <path d="M50 10 Q70 40 70 70 L50 80 L30 70 Q30 40 50 10 Z" fill="#FFD700" />
+                <circle cx="50" cy="45" r="8" fill="#000" />
+            </svg>
+            <div class="label">15. Career Launch</div>
+            <div class="desc">Taking off to success.</div>
+        </div>
+
+        <!-- 16. Geo Diamond -->
+        <div class="card">
+            <svg class="icon" viewBox="0 0 100 100">
+                <path d="M50 10 L90 40 L50 90 L10 40 Z" fill="#FFD700" stroke="#000" stroke-width="2" />
+            </svg>
+            <div class="label">16. The Gem</div>
+            <div class="desc">Valuable opportunities.</div>
+        </div>
+
+        <!-- 17. Chat Antenna -->
+        <div class="card">
+            <svg class="icon" viewBox="0 0 100 100">
+                <rect x="20" y="30" width="60" height="40" rx="10" fill="#FFD700" />
+                <line x1="50" y1="30" x2="50" y2="10" stroke="#FFD700" stroke-width="5" />
+                <circle cx="50" cy="10" r="5" fill="#FFD700" />
+            </svg>
+            <div class="label">17. Chat Bot</div>
+            <div class="desc">Communication first.</div>
+        </div>
+
+        <!-- 18. Paper Plane -->
+        <div class="card">
+            <svg class="icon" viewBox="0 0 100 100">
+                <path d="M10 90 L40 60 L90 10 L50 80 L50 60 Z" fill="none" stroke="#FFD700" stroke-width="4"
+                    stroke-linejoin="round" />
+            </svg>
+            <div class="label">18. Send CV</div>
+            <div class="desc">Simple application flow.</div>
+        </div>
+
+        <!-- 19. Bullseye -->
+        <div class="card">
+            <svg class="icon" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" stroke="#FFD700" stroke-width="4" fill="none" />
+                <circle cx="50" cy="50" r="25" stroke="#FFD700" stroke-width="4" fill="none" />
+                <circle cx="50" cy="50" r="10" fill="#FFD700" />
+            </svg>
+            <div class="label">19. Target</div>
+            <div class="desc">Hit your career goals.</div>
+        </div>
+
+        <!-- 20. The Classic Bee -->
+        <div class="card">
+            <svg class="icon" viewBox="0 0 100 100">
+                <ellipse cx="50" cy="50" rx="30" ry="40" fill="#FFD700" />
+                <line x1="20" y1="50" x2="80" y2="50" stroke="#000" stroke-width="6" />
+                <line x1="25" y1="35" x2="75" y2="35" stroke="#000" stroke-width="6" />
+                <line x1="25" y1="65" x2="75" y2="65" stroke="#000" stroke-width="6" />
+            </svg>
+            <div class="label">20. Modern Striped</div>
+            <div class="desc">Bold, classic pattern.</div>
+        </div>
+    </div>
+</body>
+
+</html>

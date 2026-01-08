@@ -1,0 +1,35 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="jbFireGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FFC837;stop-opacity:1" /> <!-- Bright Gold -->
+      <stop offset="100%" style="stop-color:#FF8008;stop-opacity:1" /> <!-- Vibrant Orange -->
+    </linearGradient>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  
+  <rect width="512" height="512" fill="#0B0F1A"/>
+  
+  <!-- The 'J' - Left side of the flame base -->
+  <!-- Starts top-left, goes down, hooks right to connect with B -->
+  <path d="M180 120 
+           L180 320 
+           Q180 420 280 420" 
+        stroke="url(#jbFireGrad)" stroke-width="45" stroke-linecap="round" fill="none" filter="url(#softGlow)"/>
+        
+  <!-- The 'B' - Right side and top tip of flame -->
+  <!-- Connected visually to the J's steam, forming the B loops -->
+  <path d="M280 120 
+           L280 420 
+           M280 120 Q420 120 420 220 Q420 300 280 280 
+           M280 280 Q450 300 450 400 Q450 480 300 450"
+        stroke="url(#jbFireGrad)" stroke-width="45" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#softGlow)"/>
+
+  <!-- J Dot / Spark at the top to complete the flame height -->
+  <circle cx="280" cy="70" r="20" fill="#FFC837" filter="url(#softGlow)">
+    <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" repeatCount="indefinite"/>
+  </circle>
+
+</svg>

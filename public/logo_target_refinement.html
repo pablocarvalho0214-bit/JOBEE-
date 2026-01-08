@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobee - Target Logo Selection</title>
+    <style>
+        :root {
+            --primary: #FFD700;
+            --bg: #0B0F1A;
+            --card-bg: #151922;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 40px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        img {
+            width: 220px;
+            height: 220px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            color: #E2E8F0;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #94A3B8;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Jobee Target Variations</h1>
+    <div class="grid">
+        <!-- Option 1 -->
+        <div class="card">
+            <img src="./logos/target_1_hexa.svg" alt="Hexa Target">
+            <h2>1. Hexa-Target</h2>
+            <p>Fusion of the Bullseye with our Honeycomb brand shape. Includes a "Hit" arrow.</p>
+        </div>
+
+        <!-- Option 2 -->
+        <div class="card">
+            <img src="./logos/target_2_golden.svg" alt="Golden Bullseye">
+            <h2>2. Golden Bullseye</h2>
+            <p>Minimalist, premium circles with a subtle "Job Done" checkmark in the center.</p>
+        </div>
+
+        <!-- Option 3 -->
+        <div class="card">
+            <img src="./logos/target_3_precision.svg" alt="Precision Match">
+            <h2>3. Precision Match</h2>
+            <p>High-tech crosshair style. Perfect for an algorithm-driven matching app.</p>
+        </div>
+    </div>
+</body>
+
+</html>

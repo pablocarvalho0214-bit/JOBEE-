@@ -1,0 +1,27 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="tinderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF655B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FD297B;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" fill="#0B0F1A"/>
+  
+  <!-- Flame Shape -->
+  <path d="M256 64 C256 64, 400 160, 400 300 C400 399.4 335.5 480 256 480 C176.5 480 112 399.4 112 300 C112 160, 256 64, 256 64 Z" 
+        fill="url(#tinderGradient)" filter="url(#shadow)"/>
+  
+  <!-- JB Monogram (Negative Space) -->
+  <text x="50%" y="65%" font-family="Arial, sans-serif" font-weight="900" font-size="180" 
+        fill="#0B0F1A" text-anchor="middle" dominant-baseline="middle" letter-spacing="-10">
+    JB
+  </text>
+  
+  <!-- Bee Stinger Accent -->
+  <path d="M256 420 L240 380 L272 380 Z" fill="#0B0F1A"/>
+</svg>

@@ -1,0 +1,26 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="wingGradient" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" style="stop-color:#00C6FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0072FF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" fill="#0B0F1A"/>
+  
+  <!-- Letter J -->
+  <text x="180" y="320" font-family="Arial, sans-serif" font-weight="900" font-size="200" 
+        fill="white" text-anchor="middle">J</text>
+        
+  <!-- Letter B as Wing -->
+  <path d="M220 120 C350 120, 420 200, 420 250 C420 300, 350 380, 220 380 L220 120 Z" 
+        fill="url(#wingGradient)" opacity="0.8"/>
+  <text x="280" y="320" font-family="Arial, sans-serif" font-weight="900" font-size="200" 
+        fill="#0B0F1A" text-anchor="middle">B</text>
+        
+  <!-- Motion Lines -->
+  <rect x="440" y="200" width="40" height="10" rx="5" fill="#00C6FF" opacity="0.6"/>
+  <rect x="460" y="230" width="30" height="10" rx="5" fill="#00C6FF" opacity="0.4"/>
+  <rect x="440" y="260" width="50" height="10" rx="5" fill="#00C6FF" opacity="0.6"/>
+</svg>

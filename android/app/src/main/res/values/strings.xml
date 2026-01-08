@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Jobee</string>
+    <string name="title_activity_main">Jobee</string>
+    <string name="package_name">com.jobee.app</string>
+    <string name="custom_url_scheme">com.jobee.app</string>
+</resources>

@@ -1,0 +1,21 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F59E0B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#B45309;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="#0B0F1A"/>
+  
+  <!-- Shield Base -->
+  <path d="M256 64 L112 112 L112 240 C112 336 176 424 256 448 C336 424 400 336 400 240 L400 112 L256 64 Z" 
+        fill="url(#shieldGrad)" />
+        
+  <!-- Flame/Bee Cutout -->
+  <path d="M256 400 C256 400 200 340 200 260 C200 210 230 180 256 160 C282 180 312 210 312 260 C312 340 256 400 256 400 Z" 
+        fill="#0B0F1A"/>
+        
+  <!-- Stylized Bee Inside Flame -->
+  <circle cx="256" cy="240" r="20" fill="#FCD34D"/>
+  <path d="M236 240 L200 220 M276 240 L312 220" stroke="#FCD34D" stroke-width="8" stroke-linecap="round"/>
+</svg>

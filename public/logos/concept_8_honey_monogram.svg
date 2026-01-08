@@ -1,0 +1,27 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="honeyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF8C00;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" fill="#0B0F1A"/>
+  
+  <!-- Hexagon Container -->
+  <path d="M256 50 L450 150 L450 362 L256 462 L62 362 L62 150 Z" 
+        stroke="url(#honeyGradient)" stroke-width="20" fill="none"/>
+        
+  <!-- JB Monogram -->
+  <g transform="translate(130, 320) scale(1.5, -1.5) rotate(180)"> 
+     <!-- Just stylized geometry representing JB abstractly -->
+  </g>
+  <text x="50%" y="55%" font-family="Arial, sans-serif" font-weight="bold" font-size="220" 
+        fill="url(#honeyGradient)" text-anchor="middle" dominant-baseline="middle" letter-spacing="-15">
+    JB
+  </text>
+  
+  <!-- Spark/Bolt Overlay -->
+  <path d="M320 200 L280 200 L290 150 L240 190 L270 190 L260 240 Z" fill="#FFE55C"/>
+</svg>

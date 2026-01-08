@@ -1,0 +1,30 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="512" height="512" fill="#0B0F1A"/>
+  
+  <!-- Tech Crosshair Frame -->
+  <path d="M256 50 V80 M256 462 V432 M50 256 H80 M462 256 H432" stroke="#FFC107" stroke-width="10" stroke-linecap="round"/>
+  
+  <!-- Corner Brackets -->
+  <path d="M100 100 L150 100 M100 100 L100 150" stroke="#FFC107" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M412 100 L362 100 M412 100 L412 150" stroke="#FFC107" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M100 412 L150 412 M100 412 L100 362" stroke="#FFC107" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M412 412 L362 412 M412 412 L412 362" stroke="#FFC107" stroke-width="10" stroke-linecap="round" fill="none"/>
+  
+  <!-- Center Hex Node (The Job) -->
+  <path d="M256 180 L320 220 L320 292 L256 332 L192 292 L192 220 Z" fill="#FFC107" filter="url(#neonGlow)"/>
+  
+  <!-- Connection Nodes -->
+  <circle cx="256" cy="256" r="15" fill="#0B0F1A"/>
+  <circle cx="256" cy="180" r="6" fill="#FFC107"/>
+  <circle cx="320" cy="292" r="6" fill="#FFC107"/>
+  <circle cx="192" cy="292" r="6" fill="#FFC107"/>
+</svg>

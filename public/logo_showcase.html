@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobee Logo Concepts</title>
+    <style>
+        body {
+            background-color: #0B0F1A;
+            font-family: 'Inter', sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            margin: 0;
+        }
+
+        h1 {
+            color: #FFC107;
+            margin-bottom: 40px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            max-width: 800px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        img {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+        }
+
+        h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #E2E8F0;
+        }
+
+        p {
+            color: #94A3B8;
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
+
+        .highlight {
+            grid-column: span 2;
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(0, 0, 0, 0));
+            border-color: rgba(255, 193, 7, 0.3);
+        }
+
+        .highlight h3 {
+            color: #FFC107;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Jobee Identity Concepts</h1>
+    <div class="grid">
+        <div class="card highlight">
+            <img src="./logos/var_d_jb_final.svg" alt="Final JB Flame">
+            <h3>FINAL: The Golden JB Flame</h3>
+            <p>Refined Monogram ("JB") + Fire Logic</p>
+        </div>
+        <div class="card">
+            <img src="./logos/var_a_shield.svg" alt="Shield">
+            <h3>Var A: Corporate Shield</h3>
+            <p>Trust & Security</p>
+        </div>
+        <div class="card">
+            <img src="./logos/var_b_kinetic.svg" alt="Kinetic">
+            <h3>Var B: Executive Kinetic</h3>
+            <p>Speed & Virality</p>
+        </div>
+        <div class="card">
+            <img src="./logos/var_c_briefcase.svg" alt="Briefcase">
+            <h3>Var C: Honey Briefcase</h3>
+            <p>Business & Jobs</p>
+        </div>
+        <div class="card">
+            <img src="./logos/var_d_monogram.svg" alt="Monogram Base">
+            <h3>Var D: Golden Monogram</h3>
+            <p>Original Abstract Concept</p>
+        </div>
+    </div>
+</body>
+
+</html>

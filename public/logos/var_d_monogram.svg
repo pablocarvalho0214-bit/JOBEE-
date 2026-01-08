@@ -1,0 +1,20 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="monogramGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F59E0B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D97706;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="#0B0F1A"/>
+  
+  <!-- J shape forming left side of flame -->
+  <path d="M220 100 L220 300 C220 360 260 400 320 400 L350 400" 
+        stroke="url(#monogramGrad)" stroke-width="60" stroke-linecap="round" fill="none"/>
+        
+  <!-- Complementary curve forming flame top -->
+  <path d="M350 100 C250 100 120 200 120 350" 
+        stroke="url(#monogramGrad)" stroke-width="60" stroke-linecap="round" fill="none" opacity="0.8"/>
+        
+  <!-- The dot of the 'j' as a floating particle -->
+  <circle cx="220" cy="50" r="30" fill="#FCD34D"/>
+</svg>

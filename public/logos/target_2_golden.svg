@@ -1,0 +1,21 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="goldRadial" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="40%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF8C00;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="#0B0F1A"/>
+  
+  <!-- Outer Ring -->
+  <circle cx="256" cy="256" r="200" stroke="url(#goldRadial)" stroke-width="45" fill="none" opacity="0.3"/>
+  
+  <!-- Middle Ring -->
+  <circle cx="256" cy="256" r="130" stroke="url(#goldRadial)" stroke-width="45" fill="none"/>
+  
+  <!-- Center Bullseye -->
+  <circle cx="256" cy="256" r="60" fill="url(#goldRadial)"/>
+  
+  <!-- "Job" checkmark integrated into center -->
+  <path d="M236 256 L250 270 L280 240" stroke="#0B0F1A" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

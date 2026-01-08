@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+    --font-sans: "Inter", sans-serif;
+    --font-display: "Plus Jakarta Sans", sans-serif;
+
+    --color-primary: #FFC700;
+    --color-secondary: #1e293b;
+    --color-match: #10b981;
+    --color-background-light: #fefce8;
+    --color-text-main: #1e293b;
+    --color-text-secondary: #64748b;
+}
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.filled {
+    font-variation-settings: 'FILL' 1;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+* {
+    box-sizing: border-box;
+}

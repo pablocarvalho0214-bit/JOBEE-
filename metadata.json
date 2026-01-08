@@ -1,0 +1,8 @@
+
+{
+  "name": "JobMatch",
+  "description": "Uma plataforma moderna de recrutamento com interface estilo Tinder para encontrar o match perfeito entre candidatos e empresas.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
