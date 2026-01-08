@@ -150,105 +150,139 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         <div className={`absolute inset-0 bg-gradient-to-b ${isCandidate ? 'from-transparent via-black/30 to-black' : 'from-transparent via-blue-900/40 to-secondary'} transition-colors duration-1000`}></div>
       </div>
 
-      <div className="flex flex-1 flex-col justify-center px-6 z-10 pt-10">
+      <div className="flex flex-1 flex-col justify-between px-6 z-10 py-8">
 
-        <div className="flex flex-col items-center text-center mb-10 relative">
-          <h1 className="text-6xl font-black uppercase tracking-tighter text-white mb-8 drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]">
-            Jo<span className="text-primary">bee</span>
-          </h1>
-
-          {/* 🎬 ANIMATION STAGE: RANDOMIZED JOURNEYS */}
-          <div className="w-full h-24 mb-6 relative flex items-center justify-center overflow-visible">
-            <div className="flex items-center justify-center w-full max-w-[320px] relative">
-              <div className="flex gap-16 items-center">
-                <HiveIcon size={35} className="opacity-20 grayscale" />
-                <div className="relative">
-                  <HiveIcon size={55} className="drop-shadow-[0_0_20px_rgba(250,204,21,0.8)] animate-pulse" />
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-visible">
-                    {[...Array(isCandidate ? 1 : 11)].map((_, i) => {
-                      const startX = isCandidate ? -100 : ((i * 137.5) % 300) - 150;
-                      const startY = isCandidate ? 0 : ((i * 199.2) % 200) - 100;
-                      const delay = i * 0.7;
-                      const pathType = isCandidate ? 0 : (i % 4);
-                      return (
-                        <div
-                          key={i}
-                          className="absolute opacity-0"
-                          style={{
-                            animation: `bee-path-${pathType} 7s infinite`,
-                            animationDelay: `${delay}s`,
-                            '--startX': `${startX}px`,
-                            '--startY': `${startY}px`
-                          } as any}
-                        >
-                          <BeeLogo size={40} />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-                <HiveIcon size={35} className="opacity-20 grayscale" />
-              </div>
-            </div>
+        {/* Header Section - Compact */}
+        <div className="flex flex-col items-center text-center relative mt-2">
+          <div className="flex items-center gap-2 mb-2">
+            <HiveIcon size={30} color={isCandidate ? "#facc15" : "#60a5fa"} className="drop-shadow-lg" />
+            <span className="text-3xl font-black uppercase tracking-tighter text-white drop-shadow-md">
+              Jo<span className={roleText.replace('text-', 'text-')}>bee</span>
+            </span>
           </div>
 
-          <h1 className="text-4xl font-bold text-white mb-2 tracking-tight drop-shadow-xl animate-fade-in">
-            Bem-vindo ao <span className="text-yellow-400 bg-clip-text hover:brightness-110 transition-all duration-300">JOBEE</span>
+          <h1 className="text-2xl font-bold text-white mb-1 tracking-tight drop-shadow-xl animate-fade-in">
+            {isCandidate ? 'Encontre sua colmeia' : 'Encontre suas abelhas'}
           </h1>
-          <p className="text-blue-100 text-lg opacity-90">Onde talentos e empresas dão match</p>
-          <p className="text-gray-200 text-sm font-medium drop-shadow">
+          <p className="text-blue-100 text-sm opacity-80 max-w-[250px]">
             {isCandidate ? 'A casa perfeita para o seu talento brilhar.' : 'O pólen ideal para polinizar seus resultados.'}
           </p>
         </div>
 
-        <div className="animate-in fade-in slide-in-from-bottom-10 duration-700">
-          <div className="flex w-full p-1.5 bg-white/30 backdrop-blur-md rounded-[2rem] mb-6 border border-white/5 transition-all">
-            <button onClick={() => setRole('candidate')} className={`flex-1 py-4 text-[10px] font-black rounded-[1.5rem] transition-all duration-500 tracking-widest ${isCandidate ? 'bg-primary text-secondary shadow-lg' : 'text-gray-400 hover:text-white'} uppercase`}>Candidato</button>
-            <button onClick={() => setRole('recruiter')} className={`flex-1 py-4 text-[10px] font-black rounded-[1.5rem] transition-all duration-500 tracking-widest ${role === 'recruiter' ? 'bg-blue-500 text-white shadow-lg' : 'text-gray-400 hover:text-white'} uppercase`}>Empresa</button>
+        {/* Animation Section - Scaled Down */}
+        <div className="w-full h-16 my-4 relative flex items-center justify-center overflow-visible">
+          <div className="flex items-center justify-center w-full max-w-[200px] relative scale-75">
+            <div className="flex gap-8 items-center">
+              <div className="relative">
+                <HiveIcon size={40} className="drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" />
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-visible">
+                  {[...Array(isCandidate ? 2 : 5)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="absolute opacity-0"
+                      style={{
+                        animation: `bee-path-${i % 4} 6s infinite`,
+                        animationDelay: `${i * 1.2}s`,
+                        '--startX': `${(i * 50) - 100}px`,
+                        '--startY': `${(i * 30) - 60}px`
+                      } as any}
+                    >
+                      <BeeLogo size={25} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Interaction Container */}
+        <div className="animate-in fade-in slide-in-from-bottom-6 duration-700 flex-1 flex flex-col max-h-[650px] justify-center">
+          {/* Role Toggle */}
+          <div className="flex w-full p-1 bg-white/10 backdrop-blur-xl rounded-2xl mb-4 border border-white/10 shadow-inner">
+            <button
+              type="button"
+              onClick={() => setRole('candidate')}
+              className={`flex-1 py-3 text-[10px] font-black rounded-xl transition-all duration-300 tracking-widest ${isCandidate ? 'bg-primary text-secondary shadow-lg' : 'text-white/60 hover:text-white'} uppercase`}
+            >
+              Candidato
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole('recruiter')}
+              className={`flex-1 py-3 text-[10px] font-black rounded-xl transition-all duration-300 tracking-widest ${role === 'recruiter' ? 'bg-blue-500 text-white shadow-lg' : 'text-white/60 hover:text-white'} uppercase`}
+            >
+              Empresa
+            </button>
           </div>
 
-          <div className="w-full space-y-5 p-8 rounded-[2.5rem] shadow-2xl bg-white/30 backdrop-blur-3xl border border-white/10 text-white">
-            <div className="flex flex-col gap-4 text-center">
-              <button
-                type="button"
-                disabled={loading}
-                onClick={handleGoogleLogin}
-                className="w-full flex h-14 items-center justify-center gap-3 rounded-2xl bg-white text-secondary text-[10px] font-black shadow-xl active:scale-95 transition-transform uppercase tracking-widest disabled:opacity-50"
-              >
-                <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" className="w-5 h-5" alt="G" />
-                Entrar com Google
-              </button>
+          <div className="w-full space-y-4 p-6 rounded-3xl shadow-2xl bg-white/10 backdrop-blur-2xl border border-white/20 text-white overflow-y-auto no-scrollbar">
+            {/* Google Login */}
+            <button
+              type="button"
+              disabled={loading}
+              onClick={handleGoogleLogin}
+              className="w-full flex h-12 items-center justify-center gap-3 rounded-xl bg-white text-secondary text-[11px] font-black shadow-lg active:scale-[0.98] transition-all uppercase tracking-widest disabled:opacity-50"
+            >
+              <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" className="w-5 h-5" alt="G" />
+              Entrar com Google
+            </button>
+
+            <div className="relative flex items-center py-1">
+              <div className="flex-grow border-t border-white/10"></div>
+              <span className="flex-shrink-0 mx-3 text-[9px] font-bold text-white/30 uppercase tracking-widest">OU E-MAIL</span>
+              <div className="flex-grow border-t border-white/10"></div>
             </div>
 
-            <div className="relative flex items-center py-2">
-              <div className="flex-grow border-t border-white/20"></div>
-              <span className="flex-shrink-0 mx-4 text-[10px] font-black text-white/40 uppercase tracking-widest">OU</span>
-              <div className="flex-grow border-t border-white/20"></div>
-            </div>
-
-            <form onSubmit={handleEmailLogin} className="space-y-5">
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-black text-white/70 uppercase tracking-widest ml-1">E-mail de acesso</label>
-                <input type="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} className={`h-12 w-full rounded-2xl border border-white/20 bg-white/30 px-5 text-white placeholder-white/40 focus:outline-none focus:ring-2 ${roleRing} focus:bg-white/40 transition-all font-medium text-sm`} required />
+            <form onSubmit={handleEmailLogin} className="space-y-4">
+              <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
+                <label className="text-[10px] font-bold text-white/70 uppercase tracking-widest ml-1">E-mail</label>
+                <input
+                  type="email"
+                  placeholder="seu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={`h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 text-white placeholder-white/30 focus:outline-none focus:ring-1 ${roleRing} focus:bg-white/10 transition-all text-sm`}
+                  required
+                />
               </div>
-              <div className="flex flex-col gap-2">
+
+              <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
                 <div className="flex items-center justify-between ml-1">
-                  <label className="text-[10px] font-black text-white/70 uppercase tracking-widest">Senha</label>
+                  <label className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Senha</label>
+                  <button type="button" onClick={handleForgotPassword} className={`text-[10px] font-bold ${roleText} hover:opacity-80 transition-opacity uppercase`}>Esqueceu?</button>
                 </div>
-                <input type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className={`h-12 w-full rounded-2xl border border-white/20 bg-white/30 px-5 text-white placeholder-white/40 focus:outline-none focus:ring-2 ${roleRing} focus:bg-white/40 transition-all text-sm`} required />
-                <div className="flex justify-end mt-1 mr-1">
-                  <button type="button" onClick={handleForgotPassword} className={`text-[10px] font-black ${roleText} hover:opacity-80 uppercase tracking-tighter`}>Esqueceu?</button>
-                </div>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={`h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 text-white placeholder-white/30 focus:outline-none focus:ring-1 ${roleRing} focus:bg-white/10 transition-all text-sm`}
+                  required
+                />
               </div>
 
-              {message && <div className="p-4 rounded-xl text-center bg-white/5 text-white border border-white/10 text-[10px] font-black uppercase tracking-wider">{message}</div>}
+              {message && (
+                <div className="p-3 rounded-xl text-center bg-red-500/10 text-red-100 border border-red-500/20 text-[10px] font-bold uppercase tracking-wider animate-shake">
+                  {message}
+                </div>
+              )}
 
-              <div className="pt-2 flex flex-col gap-3">
-                <button type="submit" disabled={loading} className={`h-16 w-full rounded-2xl font-black shadow-2xl transition-all duration-300 transform active:scale-95 disabled:opacity-50 ${isCandidate ? 'bg-primary text-secondary' : 'bg-blue-500 text-white'} uppercase`}>
-                  {loading ? 'POLINIZANDO...' : `ENTRAR COMO ${isCandidate ? 'Candidato' : 'Empresa'}`}
+              <div className="pt-2 space-y-3">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`h-12 w-full rounded-xl font-black shadow-xl transition-all duration-300 transform active:scale-[0.98] disabled:opacity-50 ${isCandidate ? 'bg-primary text-secondary' : 'bg-blue-600 text-white'} uppercase text-xs tracking-wider`}
+                >
+                  {loading ? 'CARREGANDO...' : 'ENTRAR NO JOBEE'}
                 </button>
-                <button type="button" onClick={handleSignUp} className="h-14 w-full rounded-2xl border border-white/10 text-white text-[10px] font-black uppercase tracking-widest hover:bg-white/5 transition-all">
-                  Criar Perfil {isCandidate ? 'Bee' : 'Colmeia'}
+
+                <button
+                  type="button"
+                  onClick={handleSignUp}
+                  className="w-full text-[10px] font-bold text-white/50 uppercase tracking-widest hover:text-white transition-colors py-2"
+                >
+                  Não tem conta? <span className={roleText}>Criar {isCandidate ? 'Bee' : 'Colmeia'}</span>
                 </button>
               </div>
             </form>
