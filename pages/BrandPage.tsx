@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { JobeeSymbol, JobeeFullLogo, JobeeSymbolFiveBars } from '../components/JobeeIdentity';
+import { JobeeSymbol, JobeeFullLogo, JobeeSymbolFiveBars, JobeeSymbolNeuralHive } from '../components/JobeeIdentity';
 
 const BrandPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     return (
@@ -54,14 +54,18 @@ const BrandPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     </div>
 
                     {/* Symbol Only */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-slate-800/50 p-6 rounded-3xl border border-white/5 flex flex-col items-center gap-3">
-                            <JobeeSymbol size={48} mode="color" />
-                            <span className="text-[8px] font-bold text-white/30 uppercase">Versão 3 Barras (Atual)</span>
+                    <div className="grid grid-cols-3 gap-4">
+                        <div className="bg-slate-800/50 p-4 rounded-3xl border border-white/5 flex flex-col items-center gap-3">
+                            <JobeeSymbol size={40} mode="color" />
+                            <span className="text-[7px] font-bold text-white/30 uppercase">3 Barras</span>
                         </div>
-                        <div className="bg-slate-800/50 p-6 rounded-3xl border border-white/5 flex flex-col items-center gap-3">
-                            <JobeeSymbolFiveBars size={48} mode="color" />
-                            <span className="text-[8px] font-bold text-white/30 uppercase">Versão 5 Barras (Teste)</span>
+                        <div className="bg-slate-800/50 p-4 rounded-3xl border border-white/5 flex flex-col items-center gap-3">
+                            <JobeeSymbolFiveBars size={40} mode="color" />
+                            <span className="text-[7px] font-bold text-white/30 uppercase">5 Barras</span>
+                        </div>
+                        <div className="bg-slate-800/50 p-4 rounded-3xl border border-white/5 flex flex-col items-center gap-3">
+                            <JobeeSymbolNeuralHive size={40} mode="color" />
+                            <span className="text-[7px] font-bold text-white/30 uppercase">Neural Hive</span>
                         </div>
                     </div>
                 </div>

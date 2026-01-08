@@ -69,6 +69,36 @@ export const JobeeSymbolFiveBars: React.FC<{ size?: number; mode?: 'light' | 'da
     );
 };
 
+// 1.8 CONCEITO: Neural Hive (Hexágonos Conectados)
+export const JobeeSymbolNeuralHive: React.FC<{ size?: number; mode?: 'light' | 'dark' | 'color' }> = ({
+    size = 100,
+    mode = 'color'
+}) => {
+    const primary = "#FACC15";
+    const dark = "#1E293B";
+
+    return (
+        <svg viewBox="0 0 100 100" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
+            {/* Central Hex (Candidate) */}
+            <path d="M50 35 L63 42.5 L63 57.5 L50 65 L37 57.5 L37 42.5 Z" fill={primary} />
+
+            {/* Connected Hex 1 (Company) */}
+            <path d="M65 26 L78 33.5 L78 48.5 L65 56 L52 48.5 L52 33.5 Z" fill={dark} opacity="0.8" />
+
+            {/* Connected Hex 2 (Company) */}
+            <path d="M35 26 L48 33.5 L48 48.5 L35 56 L22 48.5 L22 33.5 Z" fill={dark} opacity="0.8" />
+
+            {/* Connected Hex 3 (Partial Match) */}
+            <path d="M50 53 L63 60.5 L63 75.5 L50 83 L37 75.5 L37 60.5 Z" fill={dark} opacity="0.4" />
+
+            {/* Connection Points */}
+            <circle cx="50" cy="42" r="1.5" fill="white" opacity="0.5" />
+            <circle cx="58" cy="50" r="1.5" fill="white" opacity="0.5" />
+            <circle cx="42" cy="50" r="1.5" fill="white" opacity="0.5" />
+        </svg>
+    );
+};
+
 // 2. Logo Completa (Symbol + Wordmark)
 export const JobeeFullLogo: React.FC<{ size?: number; theme?: 'light' | 'dark' }> = ({
     size = 40,
