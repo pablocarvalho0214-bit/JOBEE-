@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../services/supabaseClient';
-import BeeLogo from '../components/BeeLogo';
+import { JobeeSymbol } from '../components/JobeeIdentity';
 
 interface ProfilePageProps {
     role?: 'candidate' | 'recruiter';
@@ -200,7 +200,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ role = 'candidate', onNavigat
                 }}
                 className="flex justify-center items-center gap-2 py-2 cursor-pointer active:opacity-50"
             >
-                <BeeLogo size={14} />
+                <JobeeSymbol size={16} mode="color" />
                 <span className="text-[7px] font-black text-white/20 uppercase tracking-[0.4em]">v1.0.5 - Jobee</span>
             </div>
 

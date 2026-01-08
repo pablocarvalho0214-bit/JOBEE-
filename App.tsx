@@ -15,7 +15,7 @@ import CandidateOnboarding from './pages/CandidateOnboarding';
 import CreateJobPage from './pages/CreateJobPage';
 import BrandPage from './pages/BrandPage';
 import BottomNav from './components/BottomNav';
-import BeeLogo from './components/BeeLogo';
+import { JobeeSymbol, JobeeSplashScreen } from './components/JobeeIdentity';
 import InstallPWAPrompt from './components/InstallPWAPrompt';
 import { Match } from './types';
 import { MOCK_MATCHES } from './constants';
@@ -28,6 +28,8 @@ const App: React.FC = () => {
   const [loadingAuth, setLoadingAuth] = useState(true);
   const [userRole, setUserRole] = useState<'candidate' | 'recruiter'>('candidate');
   const [isOnboardingCompleted, setIsOnboardingCompleted] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
+
   // Flag to force onboarding for users who haven't completed it yet
   const shouldForceOnboarding = !isOnboardingCompleted;
 
@@ -118,7 +120,11 @@ const App: React.FC = () => {
       if (session && !isRecovery) {
         await fetchProfile(session.user.id, session.user.user_metadata?.role, session.user.user_metadata?.onboarding_completed);
       }
-      setLoadingAuth(false);
+
+      // Artificial delay to show the beautiful Splash Screen
+      setTimeout(() => {
+        setLoadingAuth(false);
+      }, 1500);
     });
 
     // Listen for auth state changes
@@ -138,6 +144,16 @@ const App: React.FC = () => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Handle splash cleanup
+  useEffect(() => {
+    if (!loadingAuth) {
+      const timer = setTimeout(() => {
+        setShowSplash(false);
+      }, 1100); // 1s de animação + 100ms margem
+      return () => clearTimeout(timer);
+    }
+  }, [loadingAuth]);
 
   const selectedMatch = matches.find(m => m.id === selectedMatchId) || matches[0];
 
@@ -238,24 +254,8 @@ const App: React.FC = () => {
     }
   };
 
-  if (loadingAuth) {
-    return (
-      <div className="flex flex-col h-screen max-w-md mx-auto bg-secondary items-center justify-center p-8 text-center relative overflow-hidden">
-        {/* Decorative background for loading */}
-        <div className="absolute inset-0 opacity-10">
-          <img src="/assets/bg-candidate.png" className="w-full h-full object-cover grayscale" alt="" />
-        </div>
-
-        <div className="relative z-10 flex flex-col items-center">
-          <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-3xl bg-white shadow-2xl">
-            <BeeLogo size={80} />
-          </div>
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-6"></div>
-          <h2 className="font-black text-white uppercase tracking-[0.3em] text-xl drop-shadow-lg">Jobee</h2>
-          <p className="text-gray-400 text-xs font-bold mt-2 uppercase tracking-widest">Preparando sua colmeia...</p>
-        </div>
-      </div>
-    );
+  if (loadingAuth && showSplash) {
+    return <JobeeSplashScreen />;
   }
 
   if (currentPage === 'login' || currentPage === 'reset-password' || currentPage === 'onboarding' || shouldForceOnboarding) {
@@ -285,6 +285,7 @@ const App: React.FC = () => {
         <BottomNav activePage={currentPage} onNavigate={setCurrentPage} role={userRole} />
       )}
       <InstallPWAPrompt />
+      {showSplash && <JobeeSplashScreen isExiting={!loadingAuth} />}
     </div>
   );
 };

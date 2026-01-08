@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabaseClient';
-import BeeLogo from '../components/BeeLogo';
+import { JobeeSymbol } from '../components/JobeeIdentity';
 
 const StatCard: React.FC<{ label: string, value: string | number, icon: string, primary?: boolean }> = ({ label, value, icon, primary }) => (
     <div className={`p-4 rounded-3xl backdrop-blur-xl border border-white/10 ${primary ? 'bg-primary/20 border-primary/30' : 'bg-white/5'} flex flex-col gap-1 shadow-2xl transition-all hover:scale-[1.02] flex-shrink-0 w-40`}>
@@ -150,9 +150,9 @@ const RecruiterDashboard: React.FC<{ onNavigate?: (page: any) => void }> = ({ on
                         <section>
                             <h2 className="text-[10px] font-black uppercase tracking-widest text-white/50 mb-4 ml-1">Matches Pendentes</h2>
                             {pendingCandidates.length === 0 ? (
-                                <div className="p-10 rounded-[2.5rem] bg-white/5 border border-dashed border-white/10 flex flex-col items-center opacity-50">
-                                    <span className="material-symbols-outlined text-3xl mb-2">check_circle</span>
-                                    <p className="text-[8px] font-black uppercase tracking-widest">Nada pendente</p>
+                                <div className="p-10 rounded-[2.5rem] bg-white/5 border border-dashed border-white/10 flex flex-col items-center opacity-30">
+                                    <JobeeSymbol size={32} mode="dark" />
+                                    <p className="text-[8px] font-black uppercase tracking-widest mt-3">Nada pendente</p>
                                 </div>
                             ) : (
                                 <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-6 px-6 pb-4">

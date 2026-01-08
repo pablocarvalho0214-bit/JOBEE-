@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabaseClient';
-import BeeLogo from '../components/BeeLogo';
+import { JobeeSymbol } from '../components/JobeeIdentity';
 import { Job } from '../types';
 import { calculateJobMatch } from '../services/matchingService';
 import AdPlaceholder from '../components/AdPlaceholder';
@@ -178,7 +178,9 @@ const SwipePage: React.FC = () => {
   if (jobs.length === 0 || !current) {
     return (
       <div className="flex flex-col items-center justify-center min-h-full bg-secondary text-center px-10">
-        <span className="material-symbols-outlined text-white/10 text-8xl mb-6">explore_off</span>
+        <div className="mb-6 opacity-20">
+          <JobeeSymbol size={100} mode="dark" />
+        </div>
         <h2 className="text-xl font-black uppercase text-white/40">Fim do Enxame</h2>
         <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] mt-2">
           Não há mais vagas no seu radar no momento. Volte mais tarde para novas colmeias!

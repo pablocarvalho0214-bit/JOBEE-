@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabaseClient';
-import BeeLogo from '../components/BeeLogo';
+import { JobeeSymbol } from '../components/JobeeIdentity';
 
 interface CandidateDashboardProps {
     onNavigate: (page: any) => void;
@@ -149,9 +149,9 @@ const CandidateDashboard: React.FC<CandidateDashboardProps> = ({ onNavigate, onO
                             ))}
                         </div>
                     ) : (
-                        <div className="bg-white/5 border border-dashed border-white/10 rounded-[2.5rem] p-10 text-center opacity-50">
-                            <span className="material-symbols-outlined text-3xl mb-2">hive</span>
-                            <p className="text-[8px] font-black uppercase tracking-widest">Nenhuma entrevista agendada</p>
+                        <div className="bg-white/5 border border-dashed border-white/10 rounded-[2.5rem] p-10 text-center opacity-30 flex flex-col items-center">
+                            <JobeeSymbol size={32} mode="dark" />
+                            <p className="text-[8px] font-black uppercase tracking-widest mt-3">Nenhuma entrevista agendada</p>
                         </div>
                     )}
                 </section>

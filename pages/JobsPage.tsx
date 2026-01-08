@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Job } from '../types';
 import { generateCoverLetter } from '../services/geminiService';
 import { supabase } from '../services/supabaseClient';
-import BeeLogo from '../components/BeeLogo';
+import { JobeeSymbol } from '../components/JobeeIdentity';
 import { calculateJobMatch } from '../services/matchingService';
 
 const JobsPage: React.FC = () => {
@@ -205,9 +205,9 @@ const JobsPage: React.FC = () => {
               <span className="text-[10px] font-black uppercase tracking-[0.3em]">Buscando Vagas...</span>
             </div>
           ) : filteredJobs.length === 0 ? (
-            <div className="text-center py-20 opacity-30">
-              <span className="material-symbols-outlined text-6xl mb-4">search_off</span>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em]">Nenhuma vaga no seu raio de alcance</p>
+            <div className="text-center py-20 opacity-20 flex flex-col items-center">
+              <JobeeSymbol size={64} mode="dark" />
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] mt-6">Nenhuma vaga no seu raio de alcance</p>
             </div>
           ) : (
             filteredJobs.map((job) => (

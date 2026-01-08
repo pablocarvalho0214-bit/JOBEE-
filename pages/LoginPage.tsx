@@ -8,18 +8,6 @@ interface LoginPageProps {
   onLogin: () => void;
 }
 
-const HiveIcon: React.FC<{ size?: number; className?: string; color?: string }> = ({ size = 40, className = "", color = "#facc15" }) => (
-  <svg viewBox="0 0 100 100" width={size} height={size} className={className}>
-    <path
-      d="M50 5 L85 25 L85 65 L50 85 L15 65 L15 25 Z"
-      fill={color}
-      stroke="#1e293b"
-      strokeWidth="4"
-    />
-    <path d="M50 20 L75 35 L75 60 L50 75 L25 60 L25 35 Z" fill="#eab308" opacity="0.5" />
-    <circle cx="50" cy="50" r="10" fill="#1e293b" />
-  </svg>
-);
 
 const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
@@ -255,42 +243,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
       </div>
 
       <style>{`
-        @keyframes bee-path-0 {
-          0% { transform: translate(var(--startX), var(--startY)) scaleX(-1); opacity: 0; }
-          5% { opacity: 1; }
-          25% { transform: translate(-120px, -20px) scaleX(-1); }
-          26% { transform: translate(-120px, -20px) scaleX(1); }
-          55% { transform: translate(120px, -20px) scaleX(1); }
-          56% { transform: translate(120px, -20px) scaleX(-1); }
-          85% { transform: translate(0, -10px) scaleX(-1) scale(1.2); opacity: 1; }
-          100% { transform: translate(0, 20px) scaleX(-1) scale(0); opacity: 0; }
-        }
-        @keyframes bee-path-1 {
-          0% { transform: translate(var(--startX), var(--startY)) scaleX(1); opacity: 0; }
-          5% { opacity: 1; }
-          25% { transform: translate(120px, -20px) scaleX(1); }
-          26% { transform: translate(120px, -20px) scaleX(-1); }
-          55% { transform: translate(-120px, -20px) scaleX(-1); }
-          56% { transform: translate(-120px, -20px) scaleX(1); }
-          85% { transform: translate(0, -10px) scaleX(1) scale(1.2); opacity: 1; }
-          100% { transform: translate(0, 20px) scaleX(1) scale(0); opacity: 0; }
-        }
-        @keyframes bee-path-2 {
-          0% { transform: translate(var(--startX), var(--startY)) scaleX(-1); opacity: 0; }
-          10% { opacity: 1; }
-          45% { transform: translate(-120px, -10px) scaleX(-1); }
-          46% { transform: translate(-120px, -10px) scaleX(1); }
-          85% { transform: translate(0, -10px) scaleX(1) scale(1.2); opacity: 1; }
-          100% { transform: translate(0, 20px) scaleX(1) scale(0); opacity: 0; }
-        }
-        @keyframes bee-path-3 {
-          0% { transform: translate(var(--startX), var(--startY)) scaleX(1); opacity: 0; }
-          10% { opacity: 1; }
-          45% { transform: translate(120px, -10px) scaleX(1); }
-          46% { transform: translate(120px, -10px) scaleX(-1); }
-          85% { transform: translate(0, -10px) scaleX(-1) scale(1.2); opacity: 1; }
-          100% { transform: translate(0, 20px) scaleX(-1) scale(0); opacity: 0; }
-        }
+        /* Essential standard animations could stay if needed, but bee-paths are gone */
       `}</style>
     </div>
   );

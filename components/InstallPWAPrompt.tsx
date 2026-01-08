@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import BeeLogo from './BeeLogo';
+import { JobeeSymbol } from './JobeeIdentity';
 
 interface BeforeInstallPromptEvent extends Event {
     prompt: () => Promise<void>;
@@ -96,7 +96,7 @@ const InstallPWAPrompt: React.FC = () => {
                 <div className="flex flex-col items-center text-center">
                     {/* Logo */}
                     <div className="w-20 h-20 bg-white rounded-2xl shadow-lg flex items-center justify-center mb-4">
-                        <BeeLogo size={64} />
+                        <JobeeSymbol size={56} mode="color" />
                     </div>
 
                     {/* Title */}

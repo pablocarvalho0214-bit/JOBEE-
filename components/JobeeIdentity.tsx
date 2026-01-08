@@ -6,7 +6,6 @@ import React from 'react';
  * Based on the established Brand Briefing
  */
 
-// 1. Simbolo (O Icone)
 // 1. Simbolo Oficial (O Icone)
 export const JobeeSymbol: React.FC<{ size?: number; mode?: 'light' | 'dark' | 'color' }> = ({
     size = 100,
@@ -81,6 +80,35 @@ export const JobeeBrandCard: React.FC = () => (
                 <JobeeSymbol size={48} mode="dark" />
                 <span className="text-[8px] font-bold text-white/30 uppercase">Dark/Outline</span>
             </div>
+        </div>
+    </div>
+);
+
+// 4. SplashScreen (Full brand experience)
+export const JobeeSplashScreen: React.FC<{ isExiting?: boolean }> = ({ isExiting = false }) => (
+    <div className={`fixed inset-0 z-[9999] bg-[#FACC15] flex flex-col items-center justify-center overflow-hidden transition-all duration-1000 ease-in-out ${isExiting ? 'opacity-0 scale-110 pointer-events-none' : 'opacity-100'}`}>
+        {/* Background Subtle Texture */}
+        <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+
+        {/* Ambient Glow */}
+        <div className="absolute w-[150%] h-[150%] bg-white/10 blur-[120px] rounded-full animate-pulse"></div>
+
+        {/* Large Central Bars (Symbol focus) */}
+        <div className={`relative flex flex-col items-center transition-all duration-700 ${isExiting ? 'scale-150 blur-xl opacity-0' : 'scale-100'}`}>
+            <svg viewBox="0 0 100 100" width="140" height="140" xmlns="http://www.w3.org/2000/svg" className="animate-[bounce_3s_infinite_ease-in-out]">
+                <rect x="25" y="32" width="12" height="36" rx="6" fill="#1E293B" className="animate-pulse" />
+                <rect x="44" y="22" width="12" height="56" rx="6" fill="#1E293B" />
+                <rect x="63" y="32" width="12" height="36" rx="6" fill="#1E293B" className="animate-pulse" />
+            </svg>
+        </div>
+
+        {/* Wordmark at the bottom - Bumble Style */}
+        <div className={`absolute bottom-16 flex flex-col items-center transition-all duration-500 ${isExiting ? 'translate-y-10 opacity-0' : 'translate-y-0 opacity-100'}`}>
+            <div className="flex font-black tracking-[-0.05em] text-[#1E293B] uppercase text-4xl">
+                <span>JO</span>
+                <span className="opacity-70">BEE</span>
+            </div>
+            <div className="mt-2 h-1 w-12 bg-[#1E293B] rounded-full opacity-10"></div>
         </div>
     </div>
 );

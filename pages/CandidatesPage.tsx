@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabaseClient';
+import { JobeeSymbol } from '../components/JobeeIdentity';
 
 const CandidatesPage: React.FC = () => {
     const [candidates, setCandidates] = useState<any[]>([]);
@@ -91,8 +92,10 @@ const CandidatesPage: React.FC = () => {
                         ))}
 
                         {candidates.length === 0 && (
-                            <div className="p-12 text-center border-2 border-dashed border-white/10 rounded-[3rem]">
-                                <span className="material-symbols-outlined text-4xl text-white/10 mb-2">face_retouching_off</span>
+                            <div className="p-12 text-center border-2 border-dashed border-white/10 rounded-[3rem] flex flex-col items-center">
+                                <div className="opacity-10 mb-4">
+                                    <JobeeSymbol size={48} mode="dark" />
+                                </div>
                                 <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">Nenhuma abelha no radar.</p>
                             </div>
                         )}

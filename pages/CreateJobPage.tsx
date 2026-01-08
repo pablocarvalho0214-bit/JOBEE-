@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import BeeLogo from '../components/BeeLogo';
+import { JobeeSymbol } from '../components/JobeeIdentity';
 import { supabase } from '../services/supabaseClient';
 
 interface CreateJobPageProps {
@@ -214,8 +214,8 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
     if (publishedJob) {
         return (
             <div className="flex flex-col h-full bg-secondary text-white p-6 pt-10 justify-center items-center text-center">
-                <div className="w-24 h-24 bg-green-500 rounded-[2.5rem] flex items-center justify-center mb-8 shadow-2xl shadow-green-500/20 animate-bounce">
-                    <span className="material-symbols-outlined text-5xl">celebration</span>
+                <div className="w-24 h-24 bg-primary rounded-[2.5rem] flex items-center justify-center mb-8 shadow-2xl shadow-primary/20 animate-bounce">
+                    <JobeeSymbol size={48} mode="dark" />
                 </div>
                 <h1 className="text-3xl font-black uppercase tracking-tighter mb-2">Vaga <span className="text-primary italic">Ativada!</span></h1>
                 <p className="text-xs font-bold text-white/40 uppercase tracking-widest mb-12">As abelhas já estão em busca do polen.</p>

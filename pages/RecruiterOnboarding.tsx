@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../services/supabaseClient';
-import BeeLogo from '../components/BeeLogo';
+import { JobeeSymbol } from '../components/JobeeIdentity';
 
 interface RecruiterOnboardingProps {
     onComplete: () => void;
@@ -652,8 +652,8 @@ const RecruiterOnboarding: React.FC<RecruiterOnboardingProps> = ({ onComplete })
                     )}
                 </div>
 
-                <div className="mt-auto pt-10 pb-6">
-                    <BeeLogo size={40} className="opacity-10" />
+                <div className="mt-auto pt-10 pb-6 flex justify-center">
+                    <JobeeSymbol size={40} mode="dark" />
                 </div>
             </div>
         </div>

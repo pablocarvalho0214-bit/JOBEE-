@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { supabase } from '../services/supabaseClient';
-import BeeLogo from '../components/BeeLogo';
+import { JobeeSymbol } from '../components/JobeeIdentity';
 
 interface ResetPasswordPageProps {
     onComplete: () => void;
@@ -62,7 +62,7 @@ const ResetPasswordPage: React.FC<ResetPasswordPageProps> = ({ onComplete }) => 
             <div className="flex flex-1 flex-col justify-center px-6 z-10">
                 <div className="flex flex-col items-center text-center mb-8 animate-in fade-in slide-in-from-top-10 duration-1000">
                     <div className="mb-4 flex h-24 w-24 items-center justify-center rounded-3xl bg-white shadow-2xl transition-transform hover:scale-110 duration-500">
-                        <BeeLogo size={80} />
+                        <JobeeSymbol size={60} mode="color" />
                     </div>
                     <h4 className="text-xs font-black uppercase tracking-[0.4em] mb-1 drop-shadow-lg text-primary">Jobee Recovery</h4>
                     <h1 className="text-white text-3xl font-black leading-tight tracking-tight drop-shadow-md mb-2">

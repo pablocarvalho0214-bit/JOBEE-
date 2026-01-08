@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Match } from '../types';
 import { supabase } from '../services/supabaseClient';
+import { JobeeSymbol } from '../components/JobeeIdentity';
 
 interface MatchesPageProps {
   onOpenChat: (match: Match) => void;
@@ -249,8 +250,10 @@ const MatchesPage: React.FC<MatchesPageProps> = ({ onOpenChat, role = 'candidate
         ))}
 
         {sortedMatches.length === 0 && (
-          <div className="p-12 text-center bg-white/5 rounded-[2.5rem] border border-dashed border-white/10 animate-in fade-in duration-500">
-            <span className="material-symbols-outlined text-white/10 text-6xl mb-4">hive</span>
+          <div className="p-12 text-center bg-white/5 rounded-[2.5rem] border border-dashed border-white/10 animate-in fade-in duration-500 flex flex-col items-center">
+            <div className="opacity-10 mb-6">
+              <JobeeSymbol size={64} mode="dark" />
+            </div>
             <p className="text-white/20 text-[10px] font-black uppercase tracking-widest">Nenhuma conexão ativa nesta colmeia.</p>
           </div>
         )}
