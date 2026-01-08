@@ -7,7 +7,8 @@ import React from 'react';
  */
 
 // 1. Simbolo (O Icone)
-const JobeeSymbol: React.FC<{ size?: number; mode?: 'light' | 'dark' | 'color' }> = ({
+// 1. Simbolo Oficial (O Icone)
+export const JobeeSymbol: React.FC<{ size?: number; mode?: 'light' | 'dark' | 'color' }> = ({
     size = 100,
     mode = 'color'
 }) => {
@@ -17,8 +18,14 @@ const JobeeSymbol: React.FC<{ size?: number; mode?: 'light' | 'dark' | 'color' }
 
     return (
         <svg viewBox="0 0 100 100" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
-            {/* Flat-Base Hexagon */}
-            <path d="M25 12 L75 12 L97 50 L75 88 L25 88 L3 50 Z" fill={mode === 'dark' ? "none" : primaryColor} stroke={mode === 'dark' ? primaryColor : "none"} strokeWidth={mode === 'dark' ? "5" : "0"} transform="rotate(30, 50, 50)" />
+            {/* Hexagon Frame rotated for Pointy-top orientation */}
+            <path
+                d="M25 12 L75 12 L97 50 L75 88 L25 88 L3 50 Z"
+                fill={mode === 'dark' ? "none" : primaryColor}
+                stroke={mode === 'dark' ? primaryColor : "none"}
+                strokeWidth={mode === 'dark' ? "5" : "0"}
+                transform="rotate(30, 50, 50)"
+            />
 
             {/* Side Bar Left - Company */}
             <rect
@@ -37,76 +44,6 @@ const JobeeSymbol: React.FC<{ size?: number; mode?: 'light' | 'dark' | 'color' }
                 x="60" y="32" width="10" height="36" rx="5"
                 fill={mode === 'color' ? darkNavy : (mode === 'light' ? darkNavy : primaryColor)}
             />
-        </svg>
-    );
-};
-
-// 1.5 Simbolo Teste (4 Barras - Refinado)
-export const JobeeSymbolFourBars: React.FC<{ size?: number; mode?: 'light' | 'dark' | 'color' }> = ({
-    size = 100,
-    mode = 'color'
-}) => {
-    const darkNavy = "#1E293B";
-    const primaryColor = "#FACC15";
-
-    return (
-        <svg viewBox="0 0 100 100" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
-            <path d="M25 12 L75 12 L97 50 L75 88 L25 88 L3 50 Z" fill={mode === 'dark' ? "none" : primaryColor} stroke={mode === 'dark' ? primaryColor : "none"} strokeWidth={mode === 'dark' ? "5" : "0"} transform="rotate(30, 50, 50)" />
-
-            {/* 4 Vertical Bars Centered */}
-            <rect x="28" y="32" width="7" height="36" rx="3.5" fill={darkNavy} />
-            <rect x="40.5" y="22" width="7" height="56" rx="3.5" fill={darkNavy} />
-            <rect x="53" y="32" width="7" height="36" rx="3.5" fill={darkNavy} />
-            <rect x="65.5" y="44" width="7" height="12" rx="3.5" fill={darkNavy} />
-        </svg>
-    );
-};
-
-// 1.8 CONCEITO: Neural Hive (Hexágonos Conectados - Update)
-export const JobeeSymbolNeuralHive: React.FC<{ size?: number; mode?: 'light' | 'dark' | 'color' }> = ({
-    size = 100,
-    mode = 'color'
-}) => {
-    const primary = "#FACC15";
-    const dark = "#1E293B";
-
-    // Adjusted points for flat-base hexes in the cluster
-    return (
-        <svg viewBox="0 0 100 100" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
-            {/* Central Hex (Flat Base) */}
-            <path d="M40 45 L60 45 L69 55 L60 65 L40 65 L31 55 Z" fill={primary} transform="rotate(30, 50, 55)" />
-
-            {/* Connected Hex 1 (Flat Base) */}
-            <path d="M55 30 L75 30 L84 40 L75 50 L55 50 L46 40 Z" fill={dark} opacity="0.8" transform="rotate(30, 65, 40)" />
-
-            {/* Connected Hex 2 (Flat Base) */}
-            <path d="M25 30 L45 30 L54 40 L45 50 L25 50 L16 40 Z" fill={dark} opacity="0.8" transform="rotate(30, 35, 40)" />
-
-            {/* Connected Hex 3 (Flat Base) */}
-            <path d="M40 60 L60 60 L69 70 L60 80 L40 80 L31 70 Z" fill={dark} opacity="0.4" transform="rotate(30, 50, 70)" />
-        </svg>
-    );
-};
-
-// 1.9 CONCEITO: Diagonal Momentum (Barras Inclinadas)
-export const JobeeSymbolDiagonalBars: React.FC<{ size?: number; mode?: 'light' | 'dark' | 'color' }> = ({
-    size = 100,
-    mode = 'color'
-}) => {
-    const primary = "#FACC15";
-    const dark = "#1E293B";
-
-    return (
-        <svg viewBox="0 0 100 100" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
-            {/* Flat-Base Hexagon */}
-            <path d="M25 12 L75 12 L97 50 L75 88 L25 88 L3 50 Z" fill={mode === 'dark' ? "none" : primary} stroke={mode === 'dark' ? primary : "none"} strokeWidth={mode === 'dark' ? "5" : "0"} transform="rotate(30, 50, 50)" />
-
-            {/* 3 Tilting Bars aligned with Hexagon (30 degrees) */}
-            <g transform="rotate(-30, 50, 50)">
-                <rect x="30" y="32" width="10" height="36" rx="5" fill={dark} />
-                <rect x="45" y="22" width="10" height="56" rx="5" fill={dark} />
-                <rect x="60" y="32" width="10" height="36" rx="5" fill={dark} />
-            </g>
         </svg>
     );
 };

@@ -2,10 +2,7 @@
 import React from 'react';
 import {
     JobeeSymbol,
-    JobeeFullLogo,
-    JobeeSymbolFourBars,
-    JobeeSymbolNeuralHive,
-    JobeeSymbolDiagonalBars
+    JobeeFullLogo
 } from '../components/JobeeIdentity';
 
 const BrandPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
@@ -63,19 +60,11 @@ const BrandPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="bg-slate-800/50 p-6 rounded-3xl border border-white/5 flex flex-col items-center gap-3">
                             <JobeeSymbol size={48} mode="color" />
-                            <span className="text-[8px] font-bold text-white/30 uppercase">3 Barras (Atual)</span>
+                            <span className="text-[8px] font-bold text-white/30 uppercase">Símbolo (Cores)</span>
                         </div>
                         <div className="bg-slate-800/50 p-6 rounded-3xl border border-white/5 flex flex-col items-center gap-3">
-                            <JobeeSymbolFourBars size={48} mode="color" />
-                            <span className="text-[8px] font-bold text-white/30 uppercase">4 Barras</span>
-                        </div>
-                        <div className="bg-slate-800/50 p-6 rounded-3xl border border-white/5 flex flex-col items-center gap-3">
-                            <JobeeSymbolDiagonalBars size={48} mode="color" />
-                            <span className="text-[8px] font-bold text-white/30 uppercase">Diagonal</span>
-                        </div>
-                        <div className="bg-slate-800/50 p-6 rounded-3xl border border-white/5 flex flex-col items-center gap-3 opacity-50">
-                            <JobeeSymbolNeuralHive size={48} mode="color" />
-                            <span className="text-[8px] font-bold text-white/30 uppercase">Neural (Antigo)</span>
+                            <JobeeSymbol size={48} mode="dark" />
+                            <span className="text-[8px] font-bold text-white/30 uppercase">Símbolo (Contorno)</span>
                         </div>
                     </div>
                 </div>
