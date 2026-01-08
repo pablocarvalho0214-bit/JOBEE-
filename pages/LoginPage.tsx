@@ -2,8 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { supabase } from '../services/supabaseClient';
-import BeeLogo from '../components/BeeLogo';
-import { LogoCorpBold, LogoCorpRounded, LogoCorpTech } from '../components/LogoVariants';
+import { JobeeFullLogo, JobeeBrandCard } from '../components/JobeeIdentity';
 
 interface LoginPageProps {
   onLogin: () => void;
@@ -141,44 +140,29 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
       {/* 🖼️ BACKGROUNDS */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none transition-all duration-1000">
         <div className={`absolute inset-0 transition-opacity duration-1000 ${isCandidate ? 'bg-gradient-to-br from-yellow-700 via-orange-950 to-black' : 'bg-gradient-to-br from-blue-900 via-indigo-950 to-black'}`}>
-          {/* Subtle noise/texture for premium feel */}
           <div className="absolute inset-0 opacity-20 mix-blend-overlay bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-          {/* Animated glow orb */}
           <div className={`absolute top-1/4 left-1/4 w-96 h-96 blur-[120px] rounded-full transition-colors duration-1000 ${isCandidate ? 'bg-primary/20' : 'bg-blue-500/20'}`}></div>
         </div>
-
-        {/* VIGNETTE & BLENDS */}
         <div className={`absolute inset-0 bg-gradient-to-b ${isCandidate ? 'from-transparent via-black/30 to-black' : 'from-transparent via-blue-900/40 to-secondary'} transition-colors duration-1000`}></div>
       </div>
 
-      <div className="flex flex-1 flex-col z-10 px-6 py-4 justify-center">
+      <div className="flex flex-1 flex-col z-10 px-6 py-6 justify-center">
 
-        {/* Header - Showcase Mode */}
-        <div className="flex flex-col items-center text-center mb-4">
-          <div className="flex items-center gap-2 mb-1">
-            <HiveIcon size={24} color={isCandidate ? "#facc15" : "#60a5fa"} />
-            <span className="text-2xl font-black uppercase tracking-tighter text-white">
-              Jo<span className={roleText.replace('text-', 'text-')}>bee</span>
-            </span>
+        {/* Official Brand Header */}
+        <div className="flex flex-col items-center text-center mb-8 scale-110 animate-fade-in">
+          <JobeeFullLogo size={42} theme="light" />
+          <div className="mt-4 px-3 py-1 bg-white/5 backdrop-blur-sm rounded-full border border-white/10">
+            <p className="text-white text-[9px] font-black uppercase tracking-[0.3em] opacity-80">
+              Onde talentos e empresas dão match
+            </p>
           </div>
-          <p className="text-blue-100 text-[10px] font-bold uppercase tracking-widest opacity-90">
-            Refinando a logo Corporativa:
-          </p>
         </div>
-
-        {/* LOGO SHOWCASE ROW */}
-        <div className="flex justify-around items-end bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/10 mb-6 animate-fade-in">
-          <LogoCorpBold size={40} />
-          <LogoCorpRounded size={40} />
-          <LogoCorpTech size={40} />
-        </div>
-
 
         {/* Action Container */}
         <div className="w-full space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
           {/* Role Toggle - Slim */}
-          <div className="flex w-full p-1 bg-white/10 backdrop-blur-md rounded-xl border border-white/10">
+          <div className="flex w-full p-1 bg-white/10 backdrop-blur-md rounded-xl border border-white/10 shadow-2xl transition-all">
             <button
               type="button"
               onClick={() => setRole('candidate')}
