@@ -192,9 +192,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             </div>
           </div>
 
-          <h1 className="text-white text-3xl font-black leading-tight tracking-tight drop-shadow-md mb-2">
-            {isCandidate ? <>Encontre sua <span className="text-primary">colmeia</span></> : <>Encontre suas <span className="text-primary">abelhas</span></>}
+          <h1 className="text-4xl font-bold text-white mb-2 tracking-tight drop-shadow-xl animate-fade-in">
+            Bem-vindo ao <span className="text-yellow-400 bg-clip-text hover:brightness-110 transition-all duration-300">JOBEE</span>
           </h1>
+          <p className="text-blue-100 text-lg opacity-90">Onde talentos e empresas dão match</p>
           <p className="text-gray-200 text-sm font-medium drop-shadow">
             {isCandidate ? 'A casa perfeita para o seu talento brilhar.' : 'O pólen ideal para polinizar seus resultados.'}
           </p>
