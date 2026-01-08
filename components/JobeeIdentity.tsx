@@ -97,6 +97,28 @@ export const JobeeSymbolNeuralHive: React.FC<{ size?: number; mode?: 'light' | '
     );
 };
 
+// 1.9 CONCEITO: Diagonal Momentum (Barras Inclinadas)
+export const JobeeSymbolDiagonalBars: React.FC<{ size?: number; mode?: 'light' | 'dark' | 'color' }> = ({
+    size = 100,
+    mode = 'color'
+}) => {
+    const primary = "#FACC15";
+    const dark = "#1E293B";
+
+    return (
+        <svg viewBox="0 0 100 100" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 5 L90 27.5 L90 72.5 L50 95 L10 72.5 L10 27.5 Z" fill={mode === 'dark' ? "none" : primary} stroke={mode === 'dark' ? primary : "none"} strokeWidth={mode === 'dark' ? "5" : "0"} />
+
+            {/* 3 Tilting Bars */}
+            <g transform="rotate(-15, 50, 50)">
+                <rect x="30" y="32" width="10" height="36" rx="5" fill={dark} />
+                <rect x="45" y="22" width="10" height="56" rx="5" fill={dark} />
+                <rect x="60" y="32" width="10" height="36" rx="5" fill={dark} />
+            </g>
+        </svg>
+    );
+};
+
 // 2. Logo Completa (Symbol + Wordmark)
 export const JobeeFullLogo: React.FC<{ size?: number; theme?: 'light' | 'dark' }> = ({
     size = 40,
