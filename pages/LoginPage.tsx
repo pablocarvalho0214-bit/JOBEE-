@@ -153,14 +153,17 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
       <div className="flex flex-1 flex-col z-10 px-6 py-4 justify-center">
 
         {/* Header - Ultra Compact */}
-        <div className="flex flex-col items-center text-center mb-6">
+        <div className="flex flex-col items-center text-center mb-4">
           <div className="flex items-center gap-2 mb-1">
             <HiveIcon size={24} color={isCandidate ? "#facc15" : "#60a5fa"} />
             <span className="text-2xl font-black uppercase tracking-tighter text-white">
               Jo<span className={roleText.replace('text-', 'text-')}>bee</span>
             </span>
           </div>
-          <p className="text-blue-100 text-xs opacity-70">
+          <p className="text-blue-100 text-[10px] font-bold uppercase tracking-widest opacity-90">
+            Onde talentos e empresas dão match
+          </p>
+          <p className="text-white/50 text-[9px] mt-1 italic">
             {isCandidate ? 'Encontre sua colmeia' : 'Encontre suas abelhas'}
           </p>
         </div>
