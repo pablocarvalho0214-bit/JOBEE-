@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { supabase } from '../services/supabaseClient';
 import BeeLogo from '../components/BeeLogo';
-import { LogoVerticalBars, LogoHexGrid, LogoMinimalBee } from '../components/LogoVariants';
+import { LogoCorporate, LogoSocial, LogoDating } from '../components/LogoVariants';
 
 interface LoginPageProps {
   onLogin: () => void;
@@ -162,15 +162,15 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             </span>
           </div>
           <p className="text-blue-100 text-[10px] font-bold uppercase tracking-widest opacity-90">
-            Sugestões de Novo Logo:
+            Variações Vertical Bars:
           </p>
         </div>
 
         {/* LOGO SHOWCASE ROW */}
         <div className="flex justify-around items-end bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/10 mb-6 animate-fade-in">
-          <LogoVerticalBars size={40} />
-          <LogoHexGrid size={40} />
-          <LogoMinimalBee size={40} />
+          <LogoCorporate size={40} />
+          <LogoSocial size={40} />
+          <LogoDating size={40} />
         </div>
 
 

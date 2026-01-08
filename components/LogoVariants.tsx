@@ -1,48 +1,47 @@
-
 import React from 'react';
 
-export const LogoVerticalBars: React.FC<{ size?: number; color?: string; bgColor?: string }> = ({
-    size = 100,
-    color = "#1e293b",
-    bgColor = "#facc15"
-}) => {
-    return (
-        <div className="flex flex-col items-center gap-2">
-            <svg viewBox="0 0 100 100" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
-                {/* Hexagon Background */}
-                <path
-                    d="M50 5 L90 27.5 L90 72.5 L50 95 L10 72.5 L10 27.5 Z"
-                    fill={bgColor}
-                />
-                {/* 3 Vertical Rounded Bars */}
-                <rect x="32" y="35" width="8" height="30" rx="4" fill={color} />
-                <rect x="46" y="25" width="8" height="50" rx="4" fill={color} />
-                <rect x="60" y="35" width="8" height="30" rx="4" fill={color} />
-            </svg>
-            <span className="text-[10px] font-bold text-white uppercase tracking-widest opacity-60">Vertical Flow</span>
-        </div>
-    );
-};
-
-export const LogoHexGrid: React.FC<{ size?: number }> = ({ size = 100 }) => (
+// 1. Aspecto Corporativo (Clean, Structured, Professional)
+export const LogoCorporate: React.FC<{ size?: number }> = ({ size = 100 }) => (
     <div className="flex flex-col items-center gap-2">
         <svg viewBox="0 0 100 100" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
-            <path d="M50 5 L90 27.5 L90 72.5 L50 95 L10 72.5 L10 27.5 Z" fill="none" stroke="#facc15" strokeWidth="6" />
-            <path d="M50 25 L70 35 L70 60 L50 70 L30 60 L30 35 Z" fill="#facc15" />
-            <circle cx="50" cy="47" r="5" fill="#1e293b" />
+            <path d="M50 5 L90 27.5 L90 72.5 L50 95 L10 72.5 L10 27.5 Z" fill="#EAB308" />
+            <rect x="34" y="38" width="6" height="24" rx="1" fill="#0F172A" />
+            <rect x="47" y="28" width="6" height="44" rx="1" fill="#0F172A" />
+            <rect x="60" y="38" width="6" height="24" rx="1" fill="#0F172A" />
         </svg>
-        <span className="text-[10px] font-bold text-white uppercase tracking-widest opacity-60">Target Hex</span>
+        <span className="text-[8px] font-black text-white/50 uppercase tracking-[0.2em]">Corporativo</span>
     </div>
 );
 
-export const LogoMinimalBee: React.FC<{ size?: number }> = ({ size = 100 }) => (
+// 2. Aspecto Social Media (Bold, Vibrant, Dynamic)
+export const LogoSocial: React.FC<{ size?: number }> = ({ size = 100 }) => (
     <div className="flex flex-col items-center gap-2">
         <svg viewBox="0 0 100 100" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50" cy="50" r="40" fill="#facc15" />
-            <path d="M35 45 Q50 25 65 45" stroke="#1e293b" strokeWidth="4" fill="none" strokeLinecap="round" />
-            <path d="M35 55 Q50 35 65 55" stroke="#1e293b" strokeWidth="4" fill="none" strokeLinecap="round" />
-            <path d="M50 40 L50 70" stroke="#1e293b" strokeWidth="4" strokeLinecap="round" />
+            <defs>
+                <linearGradient id="socialGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style={{ stopColor: '#FACC15', stopOpacity: 1 }} />
+                    <stop offset="100%" style={{ stopColor: '#EAB308', stopOpacity: 1 }} />
+                </linearGradient>
+            </defs>
+            <path d="M50 5 L90 27.5 L90 72.5 L50 95 L10 72.5 L10 27.5 Z" fill="url(#socialGrad)" />
+            <rect x="30" y="35" width="10" height="30" rx="5" fill="white" fillOpacity="0.9" />
+            <rect x="45" y="22" width="10" height="56" rx="5" fill="white" fillOpacity="0.9" />
+            <rect x="60" y="35" width="10" height="30" rx="5" fill="white" fillOpacity="0.9" />
         </svg>
-        <span className="text-[10px] font-bold text-white uppercase tracking-widest opacity-60">Modern Bee</span>
+        <span className="text-[8px] font-black text-white/50 uppercase tracking-[0.2em]">Social Feed</span>
+    </div>
+);
+
+// 3. Aspecto Aplicativo de Relacionamento (Friendly, Soft, Human)
+export const LogoDating: React.FC<{ size?: number }> = ({ size = 100 }) => (
+    <div className="flex flex-col items-center gap-2">
+        <svg viewBox="0 0 100 100" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 10 Q90 10 90 27.5 L90 72.5 Q90 90 50 90 Q10 90 10 72.5 L10 27.5 Q10 10 50 10 Z" fill="#FDE047" />
+            <rect x="32" y="38" width="8" height="24" rx="4" fill="#854D0E" />
+            <rect x="46" y="25" width="8" height="50" rx="4" fill="#854D0E" />
+            <rect x="60" y="38" width="8" height="24" rx="4" fill="#854D0E" />
+            <circle cx="50" cy="50" r="3" fill="white" opacity="0.5" />
+        </svg>
+        <span className="text-[8px] font-black text-white/50 uppercase tracking-[0.2em]">Dating Style</span>
     </div>
 );
