@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { JobeeSymbol, JobeeFullLogo, JobeeSymbolFiveBars, JobeeSymbolNeuralHive } from '../components/JobeeIdentity';
+import { JobeeSymbol, JobeeFullLogo, JobeeSymbolFourBars, JobeeSymbolNeuralHive } from '../components/JobeeIdentity';
 
 const BrandPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     return (
@@ -60,8 +60,8 @@ const BrandPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                             <span className="text-[7px] font-bold text-white/30 uppercase">3 Barras</span>
                         </div>
                         <div className="bg-slate-800/50 p-4 rounded-3xl border border-white/5 flex flex-col items-center gap-3">
-                            <JobeeSymbolFiveBars size={40} mode="color" />
-                            <span className="text-[7px] font-bold text-white/30 uppercase">5 Barras</span>
+                            <JobeeSymbolFourBars size={40} mode="color" />
+                            <span className="text-[7px] font-bold text-white/30 uppercase">4 Barras</span>
                         </div>
                         <div className="bg-slate-800/50 p-4 rounded-3xl border border-white/5 flex flex-col items-center gap-3">
                             <JobeeSymbolNeuralHive size={40} mode="color" />

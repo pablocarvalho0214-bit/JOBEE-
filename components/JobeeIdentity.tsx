@@ -46,25 +46,23 @@ export const JobeeSymbol: React.FC<{ size?: number; mode?: 'light' | 'dark' | 'c
     );
 };
 
-// 1.5 Simbolo Teste (5 Barras)
-export const JobeeSymbolFiveBars: React.FC<{ size?: number; mode?: 'light' | 'dark' | 'color' }> = ({
+// 1.5 Simbolo Teste (4 Barras - Refinado)
+export const JobeeSymbolFourBars: React.FC<{ size?: number; mode?: 'light' | 'dark' | 'color' }> = ({
     size = 100,
     mode = 'color'
 }) => {
-    const primaryColor = "#FACC15";
     const darkNavy = "#1E293B";
-    const white = "#FFFFFF";
+    const primaryColor = "#FACC15";
 
     return (
         <svg viewBox="0 0 100 100" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
             <path d="M50 5 L90 27.5 L90 72.5 L50 95 L10 72.5 L10 27.5 Z" fill={mode === 'dark' ? "none" : primaryColor} stroke={mode === 'dark' ? primaryColor : "none"} strokeWidth={mode === 'dark' ? "5" : "0"} />
 
-            {/* 5 Vertical Bars */}
-            <rect x="22" y="44" width="7" height="12" rx="3.5" fill={darkNavy} />
-            <rect x="34" y="32" width="7" height="36" rx="3.5" fill={darkNavy} />
-            <rect x="46.5" y="22" width="7" height="56" rx="3.5" fill={darkNavy} />
-            <rect x="59" y="32" width="7" height="36" rx="3.5" fill={darkNavy} />
-            <rect x="71" y="44" width="7" height="12" rx="3.5" fill={darkNavy} />
+            {/* 4 Vertical Bars Centered (Removing leftmost 12, keeping 36, 56, 36, 12) */}
+            <rect x="28" y="32" width="7" height="36" rx="3.5" fill={darkNavy} />
+            <rect x="40.5" y="22" width="7" height="56" rx="3.5" fill={darkNavy} />
+            <rect x="53" y="32" width="7" height="36" rx="3.5" fill={darkNavy} />
+            <rect x="65.5" y="44" width="7" height="12" rx="3.5" fill={darkNavy} />
         </svg>
     );
 };
