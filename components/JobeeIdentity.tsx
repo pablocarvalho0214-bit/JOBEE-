@@ -18,7 +18,7 @@ const JobeeSymbol: React.FC<{ size?: number; mode?: 'light' | 'dark' | 'color' }
     return (
         <svg viewBox="0 0 100 100" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
             {/* Flat-Base Hexagon */}
-            <path d="M25 12 L75 12 L97 50 L75 88 L25 88 L3 50 Z" fill={mode === 'dark' ? "none" : primaryColor} stroke={mode === 'dark' ? primaryColor : "none"} strokeWidth={mode === 'dark' ? "5" : "0"} />
+            <path d="M25 12 L75 12 L97 50 L75 88 L25 88 L3 50 Z" fill={mode === 'dark' ? "none" : primaryColor} stroke={mode === 'dark' ? primaryColor : "none"} strokeWidth={mode === 'dark' ? "5" : "0"} transform="rotate(30, 50, 50)" />
 
             {/* Side Bar Left - Company */}
             <rect
@@ -51,7 +51,7 @@ export const JobeeSymbolFourBars: React.FC<{ size?: number; mode?: 'light' | 'da
 
     return (
         <svg viewBox="0 0 100 100" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
-            <path d="M25 12 L75 12 L97 50 L75 88 L25 88 L3 50 Z" fill={mode === 'dark' ? "none" : primaryColor} stroke={mode === 'dark' ? primaryColor : "none"} strokeWidth={mode === 'dark' ? "5" : "0"} />
+            <path d="M25 12 L75 12 L97 50 L75 88 L25 88 L3 50 Z" fill={mode === 'dark' ? "none" : primaryColor} stroke={mode === 'dark' ? primaryColor : "none"} strokeWidth={mode === 'dark' ? "5" : "0"} transform="rotate(30, 50, 50)" />
 
             {/* 4 Vertical Bars Centered */}
             <rect x="28" y="32" width="7" height="36" rx="3.5" fill={darkNavy} />
@@ -74,16 +74,16 @@ export const JobeeSymbolNeuralHive: React.FC<{ size?: number; mode?: 'light' | '
     return (
         <svg viewBox="0 0 100 100" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
             {/* Central Hex (Flat Base) */}
-            <path d="M40 45 L60 45 L69 55 L60 65 L40 65 L31 55 Z" fill={primary} />
+            <path d="M40 45 L60 45 L69 55 L60 65 L40 65 L31 55 Z" fill={primary} transform="rotate(30, 50, 55)" />
 
             {/* Connected Hex 1 (Flat Base) */}
-            <path d="M55 30 L75 30 L84 40 L75 50 L55 50 L46 40 Z" fill={dark} opacity="0.8" />
+            <path d="M55 30 L75 30 L84 40 L75 50 L55 50 L46 40 Z" fill={dark} opacity="0.8" transform="rotate(30, 65, 40)" />
 
             {/* Connected Hex 2 (Flat Base) */}
-            <path d="M25 30 L45 30 L54 40 L45 50 L25 50 L16 40 Z" fill={dark} opacity="0.8" />
+            <path d="M25 30 L45 30 L54 40 L45 50 L25 50 L16 40 Z" fill={dark} opacity="0.8" transform="rotate(30, 35, 40)" />
 
             {/* Connected Hex 3 (Flat Base) */}
-            <path d="M40 60 L60 60 L69 70 L60 80 L40 80 L31 70 Z" fill={dark} opacity="0.4" />
+            <path d="M40 60 L60 60 L69 70 L60 80 L40 80 L31 70 Z" fill={dark} opacity="0.4" transform="rotate(30, 50, 70)" />
         </svg>
     );
 };
@@ -99,7 +99,7 @@ export const JobeeSymbolDiagonalBars: React.FC<{ size?: number; mode?: 'light' |
     return (
         <svg viewBox="0 0 100 100" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
             {/* Flat-Base Hexagon */}
-            <path d="M25 12 L75 12 L97 50 L75 88 L25 88 L3 50 Z" fill={mode === 'dark' ? "none" : primary} stroke={mode === 'dark' ? primary : "none"} strokeWidth={mode === 'dark' ? "5" : "0"} />
+            <path d="M25 12 L75 12 L97 50 L75 88 L25 88 L3 50 Z" fill={mode === 'dark' ? "none" : primary} stroke={mode === 'dark' ? primary : "none"} strokeWidth={mode === 'dark' ? "5" : "0"} transform="rotate(30, 50, 50)" />
 
             {/* 3 Tilting Bars aligned with Hexagon (30 degrees) */}
             <g transform="rotate(-30, 50, 50)">
