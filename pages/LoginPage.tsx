@@ -150,120 +150,91 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         <div className={`absolute inset-0 bg-gradient-to-b ${isCandidate ? 'from-transparent via-black/30 to-black' : 'from-transparent via-blue-900/40 to-secondary'} transition-colors duration-1000`}></div>
       </div>
 
-      <div className="flex flex-1 flex-col justify-between px-6 z-10 py-8">
+      <div className="flex flex-1 flex-col z-10 px-6 py-4 justify-center">
 
-        {/* Header Section - Compact */}
-        <div className="flex flex-col items-center text-center relative mt-2">
-          <div className="flex items-center gap-2 mb-2">
-            <HiveIcon size={30} color={isCandidate ? "#facc15" : "#60a5fa"} className="drop-shadow-lg" />
-            <span className="text-3xl font-black uppercase tracking-tighter text-white drop-shadow-md">
+        {/* Header - Ultra Compact */}
+        <div className="flex flex-col items-center text-center mb-6">
+          <div className="flex items-center gap-2 mb-1">
+            <HiveIcon size={24} color={isCandidate ? "#facc15" : "#60a5fa"} />
+            <span className="text-2xl font-black uppercase tracking-tighter text-white">
               Jo<span className={roleText.replace('text-', 'text-')}>bee</span>
             </span>
           </div>
-
-          <h1 className="text-2xl font-bold text-white mb-1 tracking-tight drop-shadow-xl animate-fade-in">
+          <p className="text-blue-100 text-xs opacity-70">
             {isCandidate ? 'Encontre sua colmeia' : 'Encontre suas abelhas'}
-          </h1>
-          <p className="text-blue-100 text-sm opacity-80 max-w-[250px]">
-            {isCandidate ? 'A casa perfeita para o seu talento brilhar.' : 'O pólen ideal para polinizar seus resultados.'}
           </p>
         </div>
 
-        {/* Animation Section - Scaled Down */}
-        <div className="w-full h-16 my-4 relative flex items-center justify-center overflow-visible">
-          <div className="flex items-center justify-center w-full max-w-[200px] relative scale-75">
-            <div className="flex gap-8 items-center">
-              <div className="relative">
-                <HiveIcon size={40} className="drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" />
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-visible">
-                  {[...Array(isCandidate ? 2 : 5)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="absolute opacity-0"
-                      style={{
-                        animation: `bee-path-${i % 4} 6s infinite`,
-                        animationDelay: `${i * 1.2}s`,
-                        '--startX': `${(i * 50) - 100}px`,
-                        '--startY': `${(i * 30) - 60}px`
-                      } as any}
-                    >
-                      <BeeLogo size={25} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Action Container */}
+        <div className="w-full space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
-        {/* Main Interaction Container */}
-        <div className="animate-in fade-in slide-in-from-bottom-6 duration-700 flex-1 flex flex-col max-h-[650px] justify-center">
-          {/* Role Toggle */}
-          <div className="flex w-full p-1 bg-white/10 backdrop-blur-xl rounded-2xl mb-4 border border-white/10 shadow-inner">
+          {/* Role Toggle - Slim */}
+          <div className="flex w-full p-1 bg-white/10 backdrop-blur-md rounded-xl border border-white/10">
             <button
               type="button"
               onClick={() => setRole('candidate')}
-              className={`flex-1 py-3 text-[10px] font-black rounded-xl transition-all duration-300 tracking-widest ${isCandidate ? 'bg-primary text-secondary shadow-lg' : 'text-white/60 hover:text-white'} uppercase`}
+              className={`flex-1 py-2.5 text-[9px] font-black rounded-lg transition-all ${isCandidate ? 'bg-primary text-secondary shadow-md' : 'text-white/60 hover:text-white'} uppercase tracking-widest`}
             >
               Candidato
             </button>
             <button
               type="button"
               onClick={() => setRole('recruiter')}
-              className={`flex-1 py-3 text-[10px] font-black rounded-xl transition-all duration-300 tracking-widest ${role === 'recruiter' ? 'bg-blue-500 text-white shadow-lg' : 'text-white/60 hover:text-white'} uppercase`}
+              className={`flex-1 py-2.5 text-[9px] font-black rounded-lg transition-all ${role === 'recruiter' ? 'bg-blue-500 text-white shadow-md' : 'text-white/60 hover:text-white'} uppercase tracking-widest`}
             >
               Empresa
             </button>
           </div>
 
-          <div className="w-full space-y-4 p-6 rounded-3xl shadow-2xl bg-white/10 backdrop-blur-2xl border border-white/20 text-white overflow-y-auto no-scrollbar">
-            {/* Google Login */}
+          {/* Login Card */}
+          <div className="w-full p-5 rounded-2xl shadow-2xl bg-white/10 backdrop-blur-xl border border-white/10 text-white">
+
             <button
               type="button"
               disabled={loading}
               onClick={handleGoogleLogin}
-              className="w-full flex h-12 items-center justify-center gap-3 rounded-xl bg-white text-secondary text-[11px] font-black shadow-lg active:scale-[0.98] transition-all uppercase tracking-widest disabled:opacity-50"
+              className="w-full flex h-10 items-center justify-center gap-2 rounded-lg bg-white text-secondary text-[10px] font-black shadow-sm active:scale-[0.98] transition-all uppercase tracking-widest disabled:opacity-50"
             >
-              <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" className="w-5 h-5" alt="G" />
-              Entrar com Google
+              <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" className="w-4 h-4" alt="G" />
+              Google
             </button>
 
-            <div className="relative flex items-center py-1">
+            <div className="relative flex items-center py-3">
               <div className="flex-grow border-t border-white/10"></div>
-              <span className="flex-shrink-0 mx-3 text-[9px] font-bold text-white/30 uppercase tracking-widest">OU E-MAIL</span>
+              <span className="flex-shrink-0 mx-3 text-[8px] font-bold text-white/30 uppercase tracking-widest">OU E-MAIL</span>
               <div className="flex-grow border-t border-white/10"></div>
             </div>
 
-            <form onSubmit={handleEmailLogin} className="space-y-4">
-              <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
-                <label className="text-[10px] font-bold text-white/70 uppercase tracking-widest ml-1">E-mail</label>
+            <form onSubmit={handleEmailLogin} className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-[9px] font-bold text-white/60 uppercase tracking-widest ml-1">E-mail</label>
                 <input
                   type="email"
                   placeholder="seu@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={`h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 text-white placeholder-white/30 focus:outline-none focus:ring-1 ${roleRing} focus:bg-white/10 transition-all text-sm`}
+                  className="h-10 w-full rounded-lg border border-white/10 bg-white/5 px-4 text-white placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-primary/50 text-sm transition-all"
                   required
                 />
               </div>
 
-              <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
+              <div className="space-y-1">
                 <div className="flex items-center justify-between ml-1">
-                  <label className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Senha</label>
-                  <button type="button" onClick={handleForgotPassword} className={`text-[10px] font-bold ${roleText} hover:opacity-80 transition-opacity uppercase`}>Esqueceu?</button>
+                  <label className="text-[9px] font-bold text-white/60 uppercase tracking-widest">Senha</label>
+                  <button type="button" onClick={handleForgotPassword} className={`text-[9px] font-bold ${roleText} hover:opacity-80 transition-opacity uppercase`}>Esqueceu?</button>
                 </div>
                 <input
                   type="password"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={`h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 text-white placeholder-white/30 focus:outline-none focus:ring-1 ${roleRing} focus:bg-white/10 transition-all text-sm`}
+                  className="h-10 w-full rounded-lg border border-white/10 bg-white/5 px-4 text-white placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-primary/50 text-sm transition-all"
                   required
                 />
               </div>
 
               {message && (
-                <div className="p-3 rounded-xl text-center bg-red-500/10 text-red-100 border border-red-500/20 text-[10px] font-bold uppercase tracking-wider animate-shake">
+                <div className="p-2 rounded-lg text-center bg-red-500/10 text-red-100 border border-red-500/20 text-[9px] font-bold uppercase tracking-wider">
                   {message}
                 </div>
               )}
@@ -272,17 +243,17 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`h-12 w-full rounded-xl font-black shadow-xl transition-all duration-300 transform active:scale-[0.98] disabled:opacity-50 ${isCandidate ? 'bg-primary text-secondary' : 'bg-blue-600 text-white'} uppercase text-xs tracking-wider`}
+                  className={`h-11 w-full rounded-lg font-black shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 ${isCandidate ? 'bg-primary text-secondary' : 'bg-blue-600 text-white'} uppercase text-[11px] tracking-wider`}
                 >
-                  {loading ? 'CARREGANDO...' : 'ENTRAR NO JOBEE'}
+                  {loading ? 'CARREGANDO...' : 'ENTRAR'}
                 </button>
 
                 <button
                   type="button"
                   onClick={handleSignUp}
-                  className="w-full text-[10px] font-bold text-white/50 uppercase tracking-widest hover:text-white transition-colors py-2"
+                  className="w-full text-[9px] font-bold text-white/40 uppercase tracking-widest hover:text-white transition-colors"
                 >
-                  Não tem conta? <span className={roleText}>Criar {isCandidate ? 'Bee' : 'Colmeia'}</span>
+                  Não tem conta? <span className={roleText}>Criar Agora</span>
                 </button>
               </div>
             </form>
