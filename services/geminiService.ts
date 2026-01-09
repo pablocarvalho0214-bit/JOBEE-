@@ -18,11 +18,11 @@ export async function generateCoverLetter(jobTitle: string, company: string, des
     const prompt = `Escreva uma carta de apresentação curta (máximo 100 palavras) e persuasiva em português para a vaga de "${jobTitle}" na empresa "${company}". Baseie-se na seguinte descrição: ${description}.`;
 
     const ai = getAI();
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.0-flash',
-      contents: prompt
-    });
-    return response.text || "Não foi possível gerar a carta no momento.";
+    // Using stable 1.5-flash which is widely available and stable
+    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text() || "Não foi possível gerar a carta no momento.";
   } catch (error: any) {
     console.error("Gemini Error:", error);
     return `Erro técnico na IA: ${error.message || 'Verifique sua chave ou conexão.'}`;
@@ -51,11 +51,10 @@ export async function getRecruiterResponse(history: { text: string, sender: 'use
       Recrutador:`;
 
     const ai = getAI();
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.0-flash',
-      contents: prompt
-    });
-    return response.text || "Pode repetir, por favor?";
+    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text() || "Pode repetir, por favor?";
   } catch (error: any) {
     console.error("Gemini Chat Error:", error);
     if (error.status === 429) {
@@ -91,12 +90,11 @@ export async function getBeeaResponse(message: string, history: { text: string, 
       BEEA:`;
 
     const ai = getAI();
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.0-flash',
-      contents: prompt
-    });
+    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
 
-    return response.text || "Zzz... me distraí com uma flor. Pode repetir?";
+    return response.text() || "Zzz... me distraí com uma flor. Pode repetir?";
   } catch (error: any) {
     console.error("BEEA Error:", error);
     if (error.status === 429) return "Zzz-ops! Minha colmeia está muito ocupada agora (Limite de quota). Pode me chamar em 5 minutos? 🐝";
@@ -105,7 +103,7 @@ export async function getBeeaResponse(message: string, history: { text: string, 
   }
 }
 
-// Generate native audio using Gemini 2.5 Flash Native Audio Dialog
+// Generate native audio using Gemini 2.0 Flash (Native Audio support)
 export async function generateBeeaAudio(text: string): Promise<string | null> {
   if (!API_KEY) {
     console.error("API Key not configured for audio generation");
@@ -115,33 +113,27 @@ export async function generateBeeaAudio(text: string): Promise<string | null> {
   try {
     const ai = getAI();
 
-    // Use the native audio dialog model for speech synthesis
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-preview-native-audio-dialog',
-      contents: `Fale o seguinte texto em português brasileiro com uma voz feminina, jovem, amigável e levemente robótica. O tom deve ser acolhedor e profissional: "${text}"`,
-      config: {
-        responseModalities: ['AUDIO'],
+    // Gemini 2.0 Flash is the stable version for native audio dialog
+    const model = ai.getGenerativeModel({
+      model: "gemini-2.0-flash",
+      generationConfig: {
+        responseModalities: ["audio"],
         speechConfig: {
-          voiceConfig: {
-            prebuiltVoiceConfig: {
-              voiceName: 'Aoede' // Female voice
-            }
-          }
+          voiceConfig: { prebuiltVoiceConfig: { voiceName: "Aoede" } }
         }
-      }
+      } as any
     });
 
-    // Extract audio data from response
-    if (response.candidates && response.candidates[0]?.content?.parts) {
-      for (const part of response.candidates[0].content.parts) {
-        if (part.inlineData && part.inlineData.mimeType?.startsWith('audio/')) {
-          // Return base64 audio data with mime type
-          return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-        }
-      }
+    const result = await model.generateContent(`Fale apenas o seguinte texto em português: "${text}"`);
+    const response = await result.response;
+
+    // Extract audio data from candidates
+    const part = response.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+    if (part?.inlineData) {
+      return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
     }
 
-    console.warn("No audio data found in response");
+    console.warn("No native audio data found, verify model support");
     return null;
   } catch (error: any) {
     console.error("Audio generation error:", error);
