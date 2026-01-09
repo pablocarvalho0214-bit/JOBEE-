@@ -68,7 +68,7 @@ export async function getBeeaResponse(message: string, history: { text: string, 
   try {
     const ai = new GoogleGenAI({ apiKey: API_KEY });
     const response = await ai.models.generateContent({
-      model: 'models/gemini-3-flash-preview',
+      model: 'models/gemini-1.5-flash',
       contents: `Você é a Beea, uma robô abelha fêmea assistente virtual da plataforma Jobee. 
       Sua personalidade é prestativa, dócil, inteligente e levemente robótica. 
       Use termos relacionados a abelhas e colmeias de forma moderada (reduza o uso desses termos em 50% comparado a antes). 
