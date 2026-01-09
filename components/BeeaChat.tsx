@@ -12,17 +12,20 @@ interface Message {
 interface BeeaChatProps {
     isOpen: boolean;
     onClose: () => void;
+    userId?: string;
 }
 
-export const BeeaChat: React.FC<BeeaChatProps> = ({ isOpen, onClose }) => {
-    const STORAGE_KEY = 'jobbee_beea_chat_history';
+export const BeeaChat: React.FC<BeeaChatProps> = ({ isOpen, onClose, userId }) => {
+    const STORAGE_KEY = userId ? `jobbee_beea_chat_history_${userId}` : 'jobbee_beea_chat_history_guest';
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    // Initial load from localStorage
+    // Initial load from localStorage - depends on userId
     useEffect(() => {
+        if (!isOpen) return;
+
         const savedMessages = localStorage.getItem(STORAGE_KEY);
         if (savedMessages) {
             try {
@@ -40,14 +43,14 @@ export const BeeaChat: React.FC<BeeaChatProps> = ({ isOpen, onClose }) => {
         } else {
             resetChat();
         }
-    }, []);
+    }, [isOpen, STORAGE_KEY]);
 
-    // Save to localStorage whenever messages change
+    // Save to localStorage whenever messages change - depends on STORAGE_KEY
     useEffect(() => {
-        if (messages.length > 0) {
+        if (messages.length > 0 && userId) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
         }
-    }, [messages]);
+    }, [messages, STORAGE_KEY]);
 
     const resetChat = () => {
         setMessages([
@@ -95,10 +98,10 @@ export const BeeaChat: React.FC<BeeaChatProps> = ({ isOpen, onClose }) => {
 
             // Image mapping for plans
             const planImages: { [key: string]: string } = {
-                'PLAN_NECTAR': 'https://cea23ecb-d536-4c0c-bbb9-4fb3d0b223b0.artifact.gemini.google.com/plan_nectar_badge_1767913740837.png',
-                'PLAN_POLEN': 'https://cea23ecb-d536-4c0c-bbb9-4fb3d0b223b0.artifact.gemini.google.com/plan_polen_badge_1767913752650.png',
-                'PLAN_FAVO': 'https://cea23ecb-d536-4c0c-bbb9-4fb3d0b223b0.artifact.gemini.google.com/plan_favo_badge_1767913765478.png',
-                'PLAN_GELEIA': 'https://cea23ecb-d536-4c0c-bbb9-4fb3d0b223b0.artifact.gemini.google.com/plan_geleia_badge_1767913778839.png'
+                'PLAN_NECTAR': '/plan_nectar.png',
+                'PLAN_POLEN': '/plan_polen.png',
+                'PLAN_FAVO': '/plan_favo.png',
+                'PLAN_GELEIA': '/plan_geleia.png'
             };
 
             let cleanResponse = response;
@@ -135,6 +138,27 @@ export const BeeaChat: React.FC<BeeaChatProps> = ({ isOpen, onClose }) => {
         }
     };
 
+    const speak = (text: string) => {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+
+        const voices = window.speechSynthesis.getVoices();
+
+        // Prioridade absoluta para vozes neurais ou naturais do Google (as mais humanas)
+        const preferredVoice = voices.find(v => v.lang.includes('pt-BR') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Neural'))) ||
+            voices.find(v => v.lang.includes('pt-BR') && (v.name.includes('Maria') || v.name.includes('Heloisa') || v.name.includes('Luciana')));
+
+        if (preferredVoice) {
+            utterance.voice = preferredVoice;
+        }
+
+        utterance.lang = 'pt-BR';
+        utterance.rate = 0.95; // Levemente mais lento para soar mais natural
+        utterance.pitch = 1.0;
+
+        window.speechSynthesis.speak(utterance);
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -146,10 +170,14 @@ export const BeeaChat: React.FC<BeeaChatProps> = ({ isOpen, onClose }) => {
                 <header className="px-8 py-6 bg-gradient-to-r from-primary/10 to-transparent border-b border-white/5 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <div className="relative">
-                            <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center border border-primary/30 shadow-[0_0_15px_rgba(250,204,21,0.3)] animate-pulse">
-                                <span className="material-symbols-outlined text-primary text-3xl">smart_toy</span>
+                            <div className="w-24 h-24 rounded-[2.5rem] bg-primary/20 flex items-center justify-center border-2 border-primary/40 overflow-hidden shadow-[0_0_30px_rgba(250,204,21,0.6)]">
+                                <img
+                                    src="/beea-avatar-new.jpg"
+                                    className="w-full h-full object-cover"
+                                    alt="Beea"
+                                />
                             </div>
-                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-[#0B0F1A]"></div>
+                            <div className="absolute top-1 right-1 w-6 h-6 bg-green-500 rounded-full border-4 border-[#0B0F1A] shadow-lg"></div>
                         </div>
                         <div>
                             <h3 className="text-lg font-black uppercase tracking-tighter text-white leading-none">Beea</h3>
@@ -192,8 +220,19 @@ export const BeeaChat: React.FC<BeeaChatProps> = ({ isOpen, onClose }) => {
                                     </div>
                                 )}
                                 {msg.text}
-                                <div className={`text-[8px] mt-2 opacity-40 font-black uppercase ${msg.sender === 'user' ? 'text-secondary' : 'text-white'}`}>
-                                    {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                <div className="flex items-center justify-between mt-2">
+                                    <div className={`text-[8px] opacity-40 font-black uppercase ${msg.sender === 'user' ? 'text-secondary' : 'text-white'}`}>
+                                        {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </div>
+                                    {msg.sender === 'bee' && (
+                                        <button
+                                            onClick={() => speak(msg.text)}
+                                            className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+                                            title="Ouvir mensagem"
+                                        >
+                                            <span className="material-symbols-outlined text-[14px]">volume_up</span>
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -211,15 +250,15 @@ export const BeeaChat: React.FC<BeeaChatProps> = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Input Area */}
-                <footer className="p-6 bg-white/[0.02] border-t border-white/5">
-                    <div className="flex gap-3 items-center bg-white/5 border border-white/10 rounded-2xl p-2 focus-within:border-primary/50 transition-colors">
+                <footer className="p-6 pb-12 bg-white/[0.04] border-t border-white/5 backdrop-blur-xl">
+                    <div className="flex gap-3 items-center bg-white/5 border border-white/10 rounded-2xl p-2 focus-within:border-primary/50 transition-colors shadow-inner">
                         <input
                             type="text"
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                             placeholder="Zumbir uma dúvida..."
-                            className="flex-1 bg-transparent border-none outline-none px-4 text-sm text-white placeholder:text-white/20"
+                            className="flex-1 bg-transparent border-none outline-none px-4 text-sm text-white placeholder:text-white/20 py-2"
                         />
                         <button
                             onClick={handleSendMessage}

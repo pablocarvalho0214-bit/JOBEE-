@@ -406,7 +406,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ role = 'candidate', onNavigat
                 <div className="flex items-center gap-1 grayscale"><JobeeSymbol size={12} mode="light" /><span className="text-[6px] font-black text-white uppercase tracking-[0.6em]">BUILD 1.1.0</span></div>
             </div>
 
-            <BeeaChat isOpen={showBeea} onClose={() => setShowBeea(false)} />
+            <BeeaChat isOpen={showBeea} onClose={() => setShowBeea(false)} userId={user?.id} />
         </div>
     );
 };
