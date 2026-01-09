@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { getBeeaResponse } from '../services/geminiService';
+import { getBeeaResponse, generateBeeaAudio } from '../services/geminiService';
 
 interface Message {
     text: string;
@@ -138,13 +138,55 @@ export const BeeaChat: React.FC<BeeaChatProps> = ({ isOpen, onClose, userId }) =
         }
     };
 
-    const speak = (text: string) => {
+    const [isSpeaking, setIsSpeaking] = useState(false);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+
+    const speak = async (text: string) => {
+        // Cancel any ongoing speech
         window.speechSynthesis.cancel();
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current = null;
+        }
+
+        setIsSpeaking(true);
+
+        try {
+            // Try Gemini native audio first (more human-like)
+            const audioDataUrl = await generateBeeaAudio(text);
+
+            if (audioDataUrl) {
+                // Play the generated audio
+                const audio = new Audio(audioDataUrl);
+                audioRef.current = audio;
+
+                audio.onended = () => {
+                    setIsSpeaking(false);
+                    audioRef.current = null;
+                };
+
+                audio.onerror = () => {
+                    console.warn("Audio playback failed, falling back to Web Speech API");
+                    fallbackSpeak(text);
+                };
+
+                await audio.play();
+                return;
+            }
+        } catch (error) {
+            console.warn("Gemini audio generation failed, falling back to Web Speech API:", error);
+        }
+
+        // Fallback to Web Speech API
+        fallbackSpeak(text);
+    };
+
+    const fallbackSpeak = (text: string) => {
         const utterance = new SpeechSynthesisUtterance(text);
 
         const voices = window.speechSynthesis.getVoices();
 
-        // Prioridade absoluta para vozes neurais ou naturais do Google (as mais humanas)
+        // Prioridade para vozes neurais ou naturais do Google
         const preferredVoice = voices.find(v => v.lang.includes('pt-BR') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Neural'))) ||
             voices.find(v => v.lang.includes('pt-BR') && (v.name.includes('Maria') || v.name.includes('Heloisa') || v.name.includes('Luciana')));
 
@@ -153,8 +195,11 @@ export const BeeaChat: React.FC<BeeaChatProps> = ({ isOpen, onClose, userId }) =
         }
 
         utterance.lang = 'pt-BR';
-        utterance.rate = 0.95; // Levemente mais lento para soar mais natural
+        utterance.rate = 0.95;
         utterance.pitch = 1.0;
+
+        utterance.onend = () => setIsSpeaking(false);
+        utterance.onerror = () => setIsSpeaking(false);
 
         window.speechSynthesis.speak(utterance);
     };
@@ -227,10 +272,16 @@ export const BeeaChat: React.FC<BeeaChatProps> = ({ isOpen, onClose, userId }) =
                                     {msg.sender === 'bee' && (
                                         <button
                                             onClick={() => speak(msg.text)}
-                                            className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
-                                            title="Ouvir mensagem"
+                                            disabled={isSpeaking}
+                                            className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${isSpeaking
+                                                    ? 'bg-primary/30 animate-pulse'
+                                                    : 'bg-white/10 hover:bg-white/20'
+                                                }`}
+                                            title={isSpeaking ? "Reproduzindo..." : "Ouvir mensagem"}
                                         >
-                                            <span className="material-symbols-outlined text-[14px]">volume_up</span>
+                                            <span className="material-symbols-outlined text-[14px]">
+                                                {isSpeaking ? 'graphic_eq' : 'volume_up'}
+                                            </span>
                                         </button>
                                     )}
                                 </div>
