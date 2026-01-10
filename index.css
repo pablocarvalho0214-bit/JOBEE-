@@ -29,15 +29,26 @@
     scrollbar-width: none;
 }
 
-html, body, #root {
+html,
+body,
+#root {
     height: 100%;
     margin: 0;
     padding: 0;
     overflow: hidden;
     overscroll-behavior: none;
     -webkit-tap-highlight-color: transparent;
+    background-color: #1e293b;
+    /* Match bg-secondary */
 }
 
 * {
     box-sizing: border-box;
+}
+
+/* Fallback for keyboard layout glitches: Hide when viewport is very short (keyboard open) */
+@media (max-height: 550px) {
+    .hide-when-short {
+        display: none !important;
+    }
 }

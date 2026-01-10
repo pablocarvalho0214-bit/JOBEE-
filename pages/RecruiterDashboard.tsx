@@ -119,7 +119,7 @@ const RecruiterDashboard: React.FC<{ onNavigate?: (page: any) => void }> = ({ on
     }
 
     return (
-        <div className="flex flex-col h-full bg-secondary text-white relative overflow-hidden font-sans p-6 pt-10">
+        <div className="flex flex-col h-full bg-secondary text-white relative overflow-hidden font-sans p-6" style={{ paddingTop: 'calc(2.5rem + env(safe-area-inset-top))' }}>
             <header className="flex justify-between items-center mb-6 shrink-0 h-14">
                 <div className="flex flex-col">
                     <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Hiring Hub</span>

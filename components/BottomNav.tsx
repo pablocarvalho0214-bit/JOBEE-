@@ -1,6 +1,7 @@
-
 import React from 'react';
 import { Page } from '../types';
+import { useSafePadding } from '../hooks/useSafePadding';
+import { useKeyboardStatus } from '../hooks/useKeyboardStatus';
 
 interface BottomNavProps {
   activePage: Page;
@@ -10,6 +11,8 @@ interface BottomNavProps {
 
 const BottomNav: React.FC<BottomNavProps> = ({ activePage, onNavigate, role = 'candidate' }) => {
   const isRecruiter = role === 'recruiter';
+  const bottomPadding = useSafePadding({ basePadding: 1.5 });
+  const { isKeyboardOpen } = useKeyboardStatus();
 
   const candidateTabs: { id: string; label: string; icon: string; central?: boolean }[] = [
     { id: 'dashboard', label: 'Início', icon: 'home' },
@@ -30,8 +33,14 @@ const BottomNav: React.FC<BottomNavProps> = ({ activePage, onNavigate, role = 'c
   const activeColor = isRecruiter ? '#60A5FA' : '#FACC15';
 
   return (
-    <div className="absolute bottom-0 left-0 w-full z-[60]">
-      <div className="flex items-end justify-between w-full bg-[#0B0F1A] border-t border-white/10 px-6 pb-6 pt-3 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+    <div
+      className="fixed bottom-0 left-0 w-full z-[60] transition-transform duration-300 ease-in-out hide-when-short"
+      style={{ transform: isKeyboardOpen ? 'translateY(100%)' : 'translateY(0)' }}
+    >
+      <div
+        className="flex items-end justify-between w-full bg-[#0B0F1A] border-t border-white/10 px-6 pt-3 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]"
+        style={{ paddingBottom: bottomPadding }}
+      >
 
         {/* Animated Glow Top Line */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />

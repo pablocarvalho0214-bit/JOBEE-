@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useKeyboardStatus } from '../hooks/useKeyboardStatus';
 import { JobeeSymbol } from '../components/JobeeIdentity';
 import { supabase } from '../services/supabaseClient';
 
@@ -12,6 +13,7 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
     const [location, setLocation] = useState('');
     const [salary, setSalary] = useState('');
     const [description, setDescription] = useState('');
+    const { isKeyboardOpen } = useKeyboardStatus();
     const [jobType, setJobType] = useState<'Remoto' | 'Presencial' | 'Híbrido'>('Remoto');
     const [interviewModel, setInterviewModel] = useState<'online' | 'in_person'>('online');
     const [schedulingMode, setSchedulingMode] = useState<'automated' | 'manual'>('manual');
@@ -345,7 +347,7 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
         };
 
         return (
-            <div className="flex flex-col h-full bg-secondary text-white relative overflow-hidden font-sans p-6 pt-10">
+            <div className="flex flex-col h-full bg-secondary text-white relative overflow-hidden font-sans p-6" style={{ paddingTop: 'calc(2.5rem + env(safe-area-inset-top))' }}>
                 <header className="mb-6 shrink-0 text-center">
                     <h2 className="text-2xl font-black uppercase tracking-tighter">Revisão da <span className="text-primary italic">Vaga</span></h2>
                 </header>
@@ -772,42 +774,46 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
                 <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
             </div>
 
-            <div className="relative z-10 flex flex-col h-full p-6 pt-10">
+            <div className="relative z-10 flex flex-col h-full p-6" style={{ paddingTop: 'calc(2.5rem + env(safe-area-inset-top))' }}>
                 <div className="flex-1 min-h-0">
                     {renderStep()}
                 </div>
 
-                <div className="pt-6 shrink-0 flex gap-4">
-                    {step > 1 && (
-                        <button onClick={prevStep} className="w-20 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white/40">
-                            <span className="material-symbols-outlined">arrow_back</span>
-                        </button>
-                    )}
-                    <button
-                        onClick={nextStep}
-                        className="flex-1 h-16 bg-primary text-secondary font-black rounded-2xl shadow-xl shadow-primary/20 uppercase tracking-widest flex items-center justify-center gap-2 group"
-                    >
-                        {step === totalSteps ? (
-                            <>
-                                <span className="material-symbols-outlined font-black">visibility</span>
-                                Revisar Vaga
-                            </>
-                        ) : (
-                            <>
-                                Continuar
-                                <span className="material-symbols-outlined font-black group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                            </>
+                {!isKeyboardOpen && (
+                    <div className="pt-6 shrink-0 flex gap-4">
+                        {step > 1 && (
+                            <button onClick={prevStep} className="w-20 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white/40">
+                                <span className="material-symbols-outlined">arrow_back</span>
+                            </button>
                         )}
-                    </button>
-                </div>
+                        <button
+                            onClick={nextStep}
+                            className="flex-1 h-16 bg-primary text-secondary font-black rounded-2xl shadow-xl shadow-primary/20 uppercase tracking-widest flex items-center justify-center gap-2 group"
+                        >
+                            {step === totalSteps ? (
+                                <>
+                                    <span className="material-symbols-outlined font-black">visibility</span>
+                                    Revisar Vaga
+                                </>
+                            ) : (
+                                <>
+                                    Continuar
+                                    <span className="material-symbols-outlined font-black group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                                </>
+                            )}
+                        </button>
+                    </div>
+                )}
 
-                <div className="mt-6 flex justify-center gap-1.5 shrink-0">
-                    {[...Array(totalSteps)].map((_, i) => (
-                        <div key={i} className={`h-1 rounded-full transition-all duration-500 ${step === i + 1 ? 'w-8 bg-primary shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'w-2 bg-white/10'}`} />
-                    ))}
-                </div>
+                {!isKeyboardOpen && (
+                    <div className="mt-6 flex justify-center gap-1.5 shrink-0 hide-when-short">
+                        {[...Array(totalSteps)].map((_, i) => (
+                            <div key={i} className={`h-1 rounded-full transition-all duration-500 ${step === i + 1 ? 'w-8 bg-primary shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'w-2 bg-white/10'}`} />
+                        ))}
+                    </div>
+                )}
             </div>
-        </div>
+        </div >
     );
 };
 

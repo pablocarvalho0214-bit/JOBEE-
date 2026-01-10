@@ -19,7 +19,7 @@ export const JobeeSymbol: React.FC<{ size?: number; mode?: 'light' | 'dark' | 'c
         <svg viewBox="0 0 100 100" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
             {/* Hexagon Frame rotated for Pointy-top orientation */}
             <path
-                d="M25 12 L75 12 L97 50 L75 88 L25 88 L3 50 Z"
+                d="M26 8 L74 8 L98 50 L74 92 L26 92 L2 50 Z"
                 fill={mode === 'dark' ? "none" : primaryColor}
                 stroke={mode === 'dark' ? primaryColor : "none"}
                 strokeWidth={mode === 'dark' ? "5" : "0"}

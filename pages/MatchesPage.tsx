@@ -135,7 +135,7 @@ const MatchesPage: React.FC<MatchesPageProps> = ({ onOpenChat, role = 'candidate
         <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
       </div>
 
-      <header className="relative z-10 py-10 px-6 flex items-center justify-between">
+      <header className="relative z-10 px-6 pb-10 flex items-center justify-between" style={{ paddingTop: 'calc(2.5rem + env(safe-area-inset-top))' }}>
         <div className="flex flex-col">
           <span className={`text-[10px] font-black ${roleColor} uppercase tracking-[0.3em]`}>{isRecruiter ? 'Conexões Empresa' : 'Conexões Bee'}</span>
           <h1 className="text-2xl font-black uppercase tracking-tighter">Meus <span className={`${roleColor} text-3xl italic`}>Matches</span></h1>

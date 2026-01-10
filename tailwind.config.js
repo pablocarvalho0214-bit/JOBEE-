@@ -19,6 +19,9 @@ export default {
                 sans: ["Inter", "sans-serif"],
                 display: ["Plus Jakarta Sans", "sans-serif"],
             },
+            padding: {
+                'safe-bottom': 'max(1.5rem, calc(1.5rem + env(safe-area-inset-bottom, 0px)))',
+            },
         },
     },
     plugins: [],

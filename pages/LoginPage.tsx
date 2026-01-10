@@ -12,9 +12,14 @@ interface LoginPageProps {
 const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [role, setRole] = useState<'candidate' | 'recruiter'>('candidate');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     const errorMsg = localStorage.getItem('jobee_login_error');
@@ -32,6 +37,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
+
+    // Persistence is handled by Supabase client default (auto-refresh)
+    // Future improvement: Implement session-only logic if needed
 
     const { data: authData, error } = await supabase.auth.signInWithPassword({ email, password });
 
@@ -85,8 +93,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     setLoading(false);
   };
 
-  const handleSignUp = async () => {
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (password.length < 6) { setMessage('Mínimo 6 caracteres!'); return; }
+    if (password !== confirmPassword) { setMessage('As senhas não coincidem!'); return; }
+
     setLoading(true);
     setMessage('');
 
@@ -186,14 +197,14 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
               <div className="flex-grow border-t border-white/10"></div>
             </div>
 
-            <form onSubmit={handleEmailLogin} className="space-y-3">
+            <form onSubmit={isSignUp ? handleSignUp : handleEmailLogin} className="space-y-3">
               <div className="space-y-1">
                 <label className="text-[9px] font-bold text-white/60 uppercase tracking-widest ml-1">E-mail</label>
                 <input
                   type="email"
                   placeholder="seu@email.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => { setMessage(''); setEmail(e.target.value); }}
                   className="h-10 w-full rounded-lg border border-white/10 bg-white/5 px-4 text-white placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-primary/50 text-sm transition-all"
                   required
                 />
@@ -202,17 +213,70 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
               <div className="space-y-1">
                 <div className="flex items-center justify-between ml-1">
                   <label className="text-[9px] font-bold text-white/60 uppercase tracking-widest">Senha</label>
-                  <button type="button" onClick={handleForgotPassword} className={`text-[9px] font-bold ${roleText} hover:opacity-80 transition-opacity uppercase`}>Esqueceu?</button>
+                  {!isSignUp && (
+                    <button type="button" onClick={handleForgotPassword} className={`text-[9px] font-bold ${roleText} hover:opacity-80 transition-opacity uppercase`}>Esqueceu?</button>
+                  )}
                 </div>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="h-10 w-full rounded-lg border border-white/10 bg-white/5 px-4 text-white placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-primary/50 text-sm transition-all"
-                  required
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => { setMessage(''); setPassword(e.target.value); }}
+                    className="h-10 w-full rounded-lg border border-white/10 bg-white/5 px-4 pr-10 text-white placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-primary/50 text-sm transition-all"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">
+                      {showPassword ? 'visibility_off' : 'visibility'}
+                    </span>
+                  </button>
+                </div>
               </div>
+
+              {isSignUp && (
+                <div className="space-y-1 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <label className="text-[9px] font-bold text-white/60 uppercase tracking-widest ml-1">Confirmar Senha</label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={(e) => { setMessage(''); setConfirmPassword(e.target.value); }}
+                      className="h-10 w-full rounded-lg border border-white/10 bg-white/5 px-4 pr-10 text-white placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-primary/50 text-sm transition-all"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">
+                        {showConfirmPassword ? 'visibility_off' : 'visibility'}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {!isSignUp && (
+                <div className="flex items-center gap-2 ml-1 py-1">
+                  <input
+                    type="checkbox"
+                    id="rememberMe"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="w-3.5 h-3.5 rounded border-white/10 bg-white/5 text-primary focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                  />
+                  <label htmlFor="rememberMe" className="text-[10px] text-white/60 font-medium cursor-pointer hover:text-white transition-colors">
+                    Permanecer conectado
+                  </label>
+                </div>
+              )}
 
               {message && (
                 <div className="p-2 rounded-lg text-center bg-red-500/10 text-red-100 border border-red-500/20 text-[9px] font-bold uppercase tracking-wider">
@@ -226,15 +290,24 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                   disabled={loading}
                   className={`h-11 w-full rounded-lg font-black shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 ${isCandidate ? 'bg-primary text-secondary' : 'bg-blue-600 text-white'} uppercase text-[11px] tracking-wider`}
                 >
-                  {loading ? 'CARREGANDO...' : 'ENTRAR'}
+                  {loading ? 'CARREGANDO...' : (isSignUp ? 'CRIAR CONTA' : 'ENTRAR')}
                 </button>
 
                 <button
                   type="button"
-                  onClick={handleSignUp}
+                  onClick={() => {
+                    setIsSignUp(!isSignUp);
+                    setMessage('');
+                    setPassword('');
+                    setConfirmPassword('');
+                  }}
                   className="w-full text-[9px] font-bold text-white/40 uppercase tracking-widest hover:text-white transition-colors"
                 >
-                  Não tem conta? <span className={roleText}>Criar Agora</span>
+                  {isSignUp ? (
+                    <>Já tem uma conta? <span className={roleText}>Entrar</span></>
+                  ) : (
+                    <>Não tem conta? <span className={roleText}>Criar Agora</span></>
+                  )}
                 </button>
               </div>
             </form>

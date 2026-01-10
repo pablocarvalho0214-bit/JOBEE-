@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { JobeeSymbol } from '../components/JobeeIdentity';
+import { useKeyboardStatus } from '../hooks/useKeyboardStatus';
 
 interface CandidateOnboardingProps {
     onComplete: () => void;
@@ -23,6 +24,7 @@ const TOOL_OPTIONS = [
 
 const CandidateOnboarding: React.FC<CandidateOnboardingProps> = ({ onComplete }) => {
     const [step, setStep] = useState(1);
+    const { isKeyboardOpen } = useKeyboardStatus();
     const [loading, setLoading] = useState(false);
     const [uploadingAvatar, setUploadingAvatar] = useState(false);
     const avatarInputRef = useRef<HTMLInputElement>(null);
@@ -272,9 +274,11 @@ const CandidateOnboarding: React.FC<CandidateOnboardingProps> = ({ onComplete })
                                 </div>
                             </div>
 
-                            <button onClick={() => setStep(2)} className="w-full h-16 bg-primary text-secondary font-black rounded-2xl uppercase tracking-widest transition-all shadow-2xl shadow-primary/20">
-                                Continuar
-                            </button>
+                            {!isKeyboardOpen && (
+                                <button onClick={() => setStep(2)} className="w-full h-16 bg-primary text-secondary font-black rounded-2xl uppercase tracking-widest transition-all shadow-2xl shadow-primary/20 hide-when-short">
+                                    Continuar
+                                </button>
+                            )}
                         </div>
                     )}
 
@@ -318,14 +322,16 @@ const CandidateOnboarding: React.FC<CandidateOnboardingProps> = ({ onComplete })
                                 </div>
                             </div>
 
-                            <div className="flex gap-4">
-                                <button onClick={() => setStep(1)} className="w-20 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white/40">
-                                    <span className="material-symbols-outlined">arrow_back</span>
-                                </button>
-                                <button onClick={() => setStep(3)} className="flex-1 h-16 bg-primary text-secondary font-black rounded-2xl uppercase tracking-widest transition-all shadow-2xl shadow-primary/20">
-                                    Próximo
-                                </button>
-                            </div>
+                            {!isKeyboardOpen && (
+                                <div className="flex gap-4 hide-when-short">
+                                    <button onClick={() => setStep(1)} className="w-20 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white/40">
+                                        <span className="material-symbols-outlined">arrow_back</span>
+                                    </button>
+                                    <button onClick={() => setStep(3)} className="flex-1 h-16 bg-primary text-secondary font-black rounded-2xl uppercase tracking-widest transition-all shadow-2xl shadow-primary/20">
+                                        Próximo
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -362,14 +368,16 @@ const CandidateOnboarding: React.FC<CandidateOnboardingProps> = ({ onComplete })
                                 </div>
                             </div>
 
-                            <div className="flex gap-4">
-                                <button onClick={() => setStep(2)} className="w-20 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white/40">
-                                    <span className="material-symbols-outlined">arrow_back</span>
-                                </button>
-                                <button onClick={() => setStep(4)} className="flex-1 h-16 bg-primary text-secondary font-black rounded-2xl uppercase tracking-widest transition-all shadow-2xl shadow-primary/20">
-                                    Próximo
-                                </button>
-                            </div>
+                            {!isKeyboardOpen && (
+                                <div className="flex gap-4 hide-when-short">
+                                    <button onClick={() => setStep(2)} className="w-20 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white/40">
+                                        <span className="material-symbols-outlined">arrow_back</span>
+                                    </button>
+                                    <button onClick={() => setStep(4)} className="flex-1 h-16 bg-primary text-secondary font-black rounded-2xl uppercase tracking-widest transition-all shadow-2xl shadow-primary/20">
+                                        Próximo
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -420,14 +428,16 @@ const CandidateOnboarding: React.FC<CandidateOnboardingProps> = ({ onComplete })
                                 </div>
                             </div>
 
-                            <div className="flex gap-4">
-                                <button onClick={() => setStep(3)} className="w-20 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white/40">
-                                    <span className="material-symbols-outlined">arrow_back</span>
-                                </button>
-                                <button onClick={handleFinish} disabled={loading} className="flex-1 h-16 bg-primary text-secondary font-black rounded-2xl uppercase tracking-widest transition-all shadow-2xl flex items-center justify-center gap-2">
-                                    {loading ? <div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin"></div> : <>Finalizar <span className="material-symbols-outlined font-black">bolt</span></>}
-                                </button>
-                            </div>
+                            {!isKeyboardOpen && (
+                                <div className="flex gap-4 hide-when-short">
+                                    <button onClick={() => setStep(3)} className="w-20 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white/40">
+                                        <span className="material-symbols-outlined">arrow_back</span>
+                                    </button>
+                                    <button onClick={handleFinish} disabled={loading} className="flex-1 h-16 bg-primary text-secondary font-black rounded-2xl uppercase tracking-widest transition-all shadow-2xl flex items-center justify-center gap-2">
+                                        {loading ? <div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin"></div> : <>Finalizar <span className="material-symbols-outlined font-black">bolt</span></>}
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

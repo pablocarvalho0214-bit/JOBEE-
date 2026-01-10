@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Match } from '../types';
 import { getRecruiterResponse } from '../services/geminiService';
+import { useSafePadding } from '../hooks/useSafePadding';
 
 interface Message {
     id: string;
@@ -28,6 +29,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ match, onBack, onScheduled, role = 
     const isRecruiter = role === 'recruiter';
     const roleColor = isRecruiter ? 'text-blue-400' : 'text-primary';
     const roleBg = isRecruiter ? 'bg-blue-500' : 'bg-primary';
+    const inputPadding = useSafePadding({ basePadding: 3 });
 
     useEffect(() => {
         const savedData = localStorage.getItem(STORAGE_KEY);
@@ -187,7 +189,10 @@ const ChatPage: React.FC<ChatPageProps> = ({ match, onBack, onScheduled, role = 
             </main>
 
             {/* Input Overlay for Glass feel */}
-            <div className="relative z-20 pb-10 px-6">
+            <div
+                className="relative z-20 px-6 transition-all duration-300"
+                style={{ paddingBottom: inputPadding }}
+            >
                 <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-2 flex items-center gap-2 focus-within:ring-2 focus-within:ring-white/10 transition-all shadow-2xl">
                     <button className="w-12 h-12 flex items-center justify-center text-white/20 hover:text-white transition-colors">
                         <span className="material-symbols-outlined font-black">add_circle</span>

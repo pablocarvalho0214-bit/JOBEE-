@@ -20,8 +20,10 @@ import InstallPWAPrompt from './components/InstallPWAPrompt';
 import { Match } from './types';
 import { MOCK_MATCHES } from './constants';
 import { supabase } from './services/supabaseClient';
+import { useSafePadding } from './hooks/useSafePadding';
 
 const App: React.FC = () => {
+  const mainPadding = useSafePadding({ basePadding: 6 });
   const [currentPage, setCurrentPage] = useState<Page>('login');
   const [matches, setMatches] = useState<Match[]>(MOCK_MATCHES);
   const [selectedMatchId, setSelectedMatchId] = useState<string>(MOCK_MATCHES[0].id);
@@ -278,7 +280,10 @@ const App: React.FC = () => {
         <div className={`absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] blur-[120px] rounded-full transition-colors duration-1000 ${userRole === 'recruiter' ? 'bg-blue-500/5' : 'bg-primary/10'}`}></div>
       </div>
 
-      <main className={`flex-1 overflow-hidden relative z-10 ${currentPage === 'chat' ? '' : 'pb-24'} h-full flex flex-col`}>
+      <main
+        className={`flex-1 overflow-hidden relative z-10 h-full flex flex-col`}
+        style={{ paddingBottom: currentPage === 'chat' ? '0px' : mainPadding }}
+      >
         {renderPage()}
       </main>
       {(!shouldForceOnboarding && currentPage !== 'chat') && (

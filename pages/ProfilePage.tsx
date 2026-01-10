@@ -1,5 +1,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 import { supabase } from '../services/supabaseClient';
 import { JobeeSymbol } from '../components/JobeeIdentity';
 import { BeeaChat } from '../components/BeeaChat';
@@ -121,10 +124,16 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ role = 'candidate', onNavigat
         } catch (error: any) { console.error('Error:', error.message); } finally { setUploading(false); }
     };
 
-    const handleSubscribe = (paymentUrl: string) => {
+    const handleSubscribe = async (paymentUrl: string) => {
         if (!user || !paymentUrl || paymentUrl === '#') return;
-        const finalUrl = `${paymentUrl}?prefilled_email=${encodeURIComponent(user.email || '')}&client_reference_id=${user.id}`;
-        window.open(finalUrl, '_blank');
+        const separator = paymentUrl.includes('?') ? '&' : '?';
+        const finalUrl = `${paymentUrl}${separator}prefilled_email=${encodeURIComponent(user.email || '')}&client_reference_id=${user.id}`;
+
+        if (Capacitor.isNativePlatform()) {
+            await Browser.open({ url: finalUrl });
+        } else {
+            window.open(finalUrl, '_blank');
+        }
     };
 
     const getTierDisplayName = (tier: string) => {
@@ -143,10 +152,10 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ role = 'candidate', onNavigat
     };
 
     const planData = [
-        { id: 'nectar', name: 'Néctar', price: 'Grátis', icon: 'spa', color: 'from-slate-400 via-slate-500 to-slate-400', bg: 'bg-slate-900/80', glow: 'shadow-[0_0_20px_rgba(148,163,184,0.3)]', features: isRecruiter ? ['3 Vagas', '10 Recrutas'] : ['3 Super Likes', 'Filtro Básico'] },
-        { id: 'polen', name: 'Pólen', price: 'R$ 29,90', icon: 'filter_vintage', color: 'from-blue-400 via-cyan-400 to-blue-400', bg: 'bg-blue-900/40', glow: 'shadow-[0_0_25px_rgba(59,130,246,0.5)]', features: isRecruiter ? ['10 Vagas', 'Chats Ilimitados'] : ['Likes Ilimitados', 'Ver Visitas'] },
-        { id: 'favo', name: 'Favo', price: 'R$ 59,90', icon: 'hexagon', color: 'from-yellow-400 via-orange-400 to-yellow-400', bg: 'bg-yellow-900/40', glow: 'shadow-[0_0_30px_rgba(234,179,8,0.5)]', features: isRecruiter ? ['Vagas ILMD', 'IA Match'] : ['Quem deu Match', 'Boost Diário'] },
-        { id: 'geleia', name: 'Geleia', price: 'R$ 99,90', icon: 'crown', color: 'from-purple-400 via-pink-400 to-purple-400', bg: 'bg-purple-900/40', glow: 'shadow-[0_0_35px_rgba(168,85,247,0.5)]', features: isRecruiter ? ['Gestor VIP', 'API'] : ['Perfil Destaque', 'Mentoria IA'] },
+        { id: 'nectar', name: 'Néctar', price: 'Grátis', icon: 'spa', color: 'from-slate-400 via-slate-500 to-slate-400', bg: 'bg-slate-900/80', glow: 'shadow-[0_0_20px_rgba(148,163,184,0.3)]', features: isRecruiter ? ['3 Vagas', '10 Recrutas'] : ['3 Super Likes', 'Filtro Básico'], url: '#' },
+        { id: 'polen', name: 'Pólen', price: 'R$ 29,90', icon: 'filter_vintage', color: 'from-blue-400 via-cyan-400 to-blue-400', bg: 'bg-blue-900/40', glow: 'shadow-[0_0_25px_rgba(59,130,246,0.5)]', features: isRecruiter ? ['10 Vagas', 'Chats Ilimitados'] : ['Likes Ilimitados', 'Ver Visitas'], url: 'https://buy.stripe.com/test_14A8wOcaI0Lw2YP3CS87K00' },
+        { id: 'favo', name: 'Favo', price: 'R$ 59,90', icon: 'hexagon', color: 'from-yellow-400 via-orange-400 to-yellow-400', bg: 'bg-yellow-900/40', glow: 'shadow-[0_0_30px_rgba(234,179,8,0.5)]', features: isRecruiter ? ['Vagas ILMD', 'IA Match'] : ['Quem deu Match', 'Boost Diário'], url: 'https://buy.stripe.com/test_dRm5kC8Yw65Q0QH4GW87K01' },
+        { id: 'geleia', name: 'Geleia', price: 'R$ 99,90', icon: 'crown', color: 'from-purple-400 via-pink-400 to-purple-400', bg: 'bg-purple-900/40', glow: 'shadow-[0_0_35px_rgba(168,85,247,0.5)]', features: isRecruiter ? ['Gestor VIP', 'API'] : ['Perfil Destaque', 'Mentoria IA'], url: 'https://buy.stripe.com/test_eVqdR8eiQeCmarhflA87K02' },
     ];
 
     const tierColors = getTierColors(user?.db_subscription_tier || 'nectar');
@@ -159,7 +168,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ role = 'candidate', onNavigat
     };
 
     return (
-        <div className="flex flex-col h-full bg-[#0B0F1A] text-white relative overflow-hidden font-sans px-4 pt-6 pb-24">
+        <div className="flex flex-col h-full bg-[#0B0F1A] text-white relative overflow-hidden font-sans px-4 pb-24" style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top))' }}>
 
             {/* PHYSICAL DUAL-ID ACCESS BADGE */}
             <div className="relative z-20 mb-8">
@@ -320,7 +329,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ role = 'candidate', onNavigat
             </div>
 
             {/* MODALS (Benefits) */}
-            {selectedPlan && (
+            {selectedPlan && createPortal(
                 <div className="fixed inset-0 z-[100] flex items-end justify-center">
                     <div className="absolute inset-0 bg-black/95 backdrop-blur-xl" onClick={() => setSelectedPlan(null)} />
                     <div className="relative w-full bg-[#0F172A] border-t border-white/10 rounded-t-[3.5rem] p-8 animate-in slide-in-from-bottom duration-500 flex flex-col max-h-[92vh] shadow-2xl overflow-hidden">
@@ -365,10 +374,11 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ role = 'candidate', onNavigat
 
                         <button onClick={() => setSelectedPlan(null)} className="w-full h-14 mt-4 text-[9px] font-black uppercase text-white/20 tracking-widest underline underline-offset-8 decoration-white/10">Voltar ao Perfil</button>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
-            {showNotifications && (
+            {showNotifications && createPortal(
                 <div className="fixed inset-0 z-[100] flex items-end justify-center">
                     <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={() => setShowNotifications(false)} />
                     <div className="relative w-full bg-[#0B0F1A] border-t border-white/10 rounded-t-[3.5rem] p-10 animate-in slide-in-from-bottom duration-500">
@@ -383,11 +393,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ role = 'candidate', onNavigat
                         </div>
                         <button onClick={() => setShowNotifications(false)} className={`w-full h-18 ${isRecruiter ? 'bg-blue-500' : 'bg-primary'} text-secondary font-black rounded-[2rem] uppercase`}>Confirmar</button>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
             {/* Radar Modal */}
-            {showPreferences && (
+            {showPreferences && createPortal(
                 <div className="fixed inset-0 z-[100] flex items-end justify-center">
                     <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={() => setShowPreferences(false)} />
                     <div className="relative w-full bg-[#0B0F1A] border-t border-white/10 rounded-t-[3.5rem] p-10 animate-in slide-in-from-bottom duration-500">
@@ -399,14 +410,15 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ role = 'candidate', onNavigat
                         </div>
                         <button onClick={async () => { await supabase.from('profiles').update({ search_radius: searchRadius }).eq('id', user.id); setShowPreferences(false); }} className={`w-full h-18 ${isRecruiter ? 'bg-blue-500' : 'bg-primary'} text-secondary font-black rounded-[2rem] uppercase`}>Salvar Raio</button>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
             <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-1 opacity-20 pointer-events-none z-10">
                 <div className="flex items-center gap-1 grayscale"><JobeeSymbol size={12} mode="light" /><span className="text-[6px] font-black text-white uppercase tracking-[0.6em]">BUILD 1.1.0</span></div>
             </div>
 
-            <BeeaChat isOpen={showBeea} onClose={() => setShowBeea(false)} userId={user?.id} />
+            {createPortal(<BeeaChat isOpen={showBeea} onClose={() => setShowBeea(false)} userId={user?.id} />, document.body)}
         </div>
     );
 };
