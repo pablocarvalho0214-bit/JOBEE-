@@ -63,34 +63,50 @@ const CandidateDashboard: React.FC<CandidateDashboardProps> = ({ onNavigate, onO
     }
 
     return (
-        <div className="flex flex-col h-full bg-secondary text-white relative overflow-hidden font-sans p-6" style={{ paddingTop: 'calc(2.5rem + env(safe-area-inset-top))' }}>
-            <header className="flex justify-between items-center mb-6 shrink-0 h-14">
+        <div className="flex flex-col h-full bg-[#0B0F1A] text-white relative overflow-hidden font-sans p-6" style={{ paddingTop: 'calc(2.5rem + env(safe-area-inset-top))' }}>
+
+            {/* AMBIENT BACKGROUND */}
+            <div className="absolute inset-0 pointer-events-none opacity-20">
+                <div className="absolute top-[10%] right-[-10%] w-[60%] h-[40%] bg-primary/10 blur-[120px] rounded-full rotate-45" />
+                <div className="absolute bottom-[20%] left-[-10%] w-[50%] h-[50%] bg-blue-500/10 blur-[120px] rounded-full" />
+                <div className="absolute inset-0 opacity-[0.03]" style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill-rule='evenodd' stroke='%23ffffff' stroke-width='1' fill='none'/%3E%3C/svg%3E")`,
+                    backgroundSize: '30px 52px'
+                }} />
+            </div>
+            <header className="flex justify-between items-center mb-10 shrink-0 h-14 relative z-10">
                 <div className="flex flex-col">
-                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Sua Colmeia</span>
-                    <h1 className="text-2xl font-black uppercase tracking-tighter leading-none">
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">Sua Colmeia</span>
+                    <h1 className="text-3xl font-black uppercase tracking-tighter leading-none mt-1">
                         Voe, <span className="text-primary italic">{profile?.full_name?.split(' ')[0] || 'Bee'}</span>
                     </h1>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                     {/* Notification Bell */}
                     <button
                         onClick={() => setShowNotifications(!showNotifications)}
-                        className={`w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center relative active:scale-95 transition-all ${showNotifications ? 'border-primary/50 text-primary' : ''}`}
+                        className={`w-12 h-14 relative flex items-center justify-center active:scale-95 transition-all group`}
+                        style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}
                     >
-                        <span className={`material-symbols-outlined ${showNotifications ? 'text-primary' : 'text-white/50'} text-xl`}>notifications</span>
+                        <div className={`absolute inset-0 bg-white/5 border border-white/10 group-hover:bg-white/10 ${showNotifications ? 'bg-primary/20 border-primary/30' : ''}`} />
+                        <span className={`material-symbols-outlined ${showNotifications ? 'text-primary' : 'text-white/50'} text-2xl relative z-10`}>notifications</span>
                         {stats.pendingLikes > 0 && (
-                            <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full border-2 border-secondary animate-pulse"></span>
+                            <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-primary rounded-full border-2 border-[#0B0F1A] animate-pulse z-20"></span>
                         )}
                     </button>
 
-                    {/* Profile Avatar */}
+                    {/* Profile Avatar Hex */}
                     <button
                         onClick={() => onNavigate('profile')}
-                        className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 overflow-hidden active:scale-95 transition-all p-0.5"
+                        className="w-12 h-14 relative p-0.5 active:scale-95 transition-all group"
+                        style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}
                     >
+                        <div className="absolute inset-0 bg-primary/20 group-hover:bg-primary/40 transition-colors" />
+                        <div className="absolute inset-[1px] bg-[#0B0F1A]" style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }} />
                         <img
                             src={profile?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile?.id}`}
-                            className="w-full h-full rounded-[10px] object-cover"
+                            className="w-full h-full object-cover relative z-10"
+                            style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}
                             alt="Profile"
                         />
                     </button>
@@ -98,20 +114,30 @@ const CandidateDashboard: React.FC<CandidateDashboardProps> = ({ onNavigate, onO
             </header>
 
             <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide space-y-8 pb-10">
-                {/* Stats Carousel */}
-                <div className="flex gap-4 overflow-x-auto scrollbar-hide -mx-6 px-6 pb-2">
-                    {[
-                        { label: 'Matches', value: stats.totalMatches, icon: 'bolt', color: 'text-primary' },
-                        { label: 'Agenda', value: stats.scheduledInterviews, icon: 'calendar_today', color: 'text-green-400' },
-                        { label: 'Vistos', value: stats.profileViews, icon: 'visibility', color: 'text-blue-400' },
-                        { label: 'Nível', value: '12', icon: 'military_tech', color: 'text-orange-400' }
-                    ].map((stat, idx) => (
-                        <div key={idx} className="bg-white/5 border border-white/10 rounded-3xl p-4 flex-shrink-0 w-32 backdrop-blur-md">
-                            <span className={`material-symbols-outlined ${stat.color} mb-2 block text-xl`}>{stat.icon}</span>
-                            <div className="text-xl font-black text-white">{stat.value}</div>
-                            <div className="text-[8px] font-black text-white/30 uppercase mt-1">{stat.label}</div>
-                        </div>
-                    ))}
+                {/* Stats Carousel - HEXAGONAL THEME */}
+                <div className="relative z-10">
+                    <div className="flex gap-4 overflow-x-auto scrollbar-hide -mx-6 px-6 pb-6 pt-2">
+                        {[
+                            { label: 'Matches', value: stats.totalMatches, icon: 'bolt', color: 'text-primary' },
+                            { label: 'Agenda', value: stats.scheduledInterviews, icon: 'calendar_today', color: 'text-green-400' },
+                            { label: 'Vistos', value: stats.profileViews, icon: 'visibility', color: 'text-blue-400' },
+                            { label: 'Nível', value: '12', icon: 'military_tech', color: 'text-orange-400' }
+                        ].map((stat, idx) => (
+                            <div key={idx} className="flex-shrink-0 flex flex-col items-center">
+                                <div
+                                    className="w-24 h-28 relative flex flex-col items-center justify-center p-4 transition-transform hover:scale-105"
+                                    style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}
+                                >
+                                    <div className="absolute inset-0 bg-white/5 border border-white/10 backdrop-blur-md" />
+                                    <div className="relative z-10 flex flex-col items-center">
+                                        <span className={`material-symbols-outlined ${stat.color} mb-1 text-xl`}>{stat.icon}</span>
+                                        <div className="text-xl font-black text-white leading-none">{stat.value}</div>
+                                        <div className="text-[7px] font-black text-white/30 uppercase mt-1 tracking-widest">{stat.label}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Upcoming Interviews Slider */}
@@ -126,12 +152,21 @@ const CandidateDashboard: React.FC<CandidateDashboardProps> = ({ onNavigate, onO
                             {upcomingInterviews.map((interview) => (
                                 <div key={interview.id} className="flex-shrink-0 w-72 bg-gradient-to-br from-white/10 to-white/5 border border-white/10 rounded-[2.5rem] p-6 backdrop-blur-md relative overflow-hidden active:scale-95 transition-all">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-14 h-14 rounded-2xl bg-white/5 overflow-hidden border border-white/5">
-                                            <img src={(interview.jobs as any)?.company_logo_url} className="w-full h-full object-cover" alt="" />
+                                        <div
+                                            className="w-16 h-18 relative p-0.5 bg-white/10 shrink-0"
+                                            style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}
+                                        >
+                                            <div className="absolute inset-0 bg-[#0B0F1A]" style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }} />
+                                            <img
+                                                src={(interview.jobs as any)?.company_logo_url}
+                                                className="w-full h-full object-cover relative z-10"
+                                                style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}
+                                                alt=""
+                                            />
                                         </div>
                                         <div className="flex-1">
-                                            <h3 className="text-xs font-black uppercase text-white truncate w-40">{(interview.jobs as any)?.title}</h3>
-                                            <p className="text-[9px] font-bold text-white/30 uppercase truncate w-40">{(interview.jobs as any)?.company_name}</p>
+                                            <h3 className="text-[11px] font-black uppercase text-white truncate w-40 tracking-tight">{(interview.jobs as any)?.title}</h3>
+                                            <p className="text-[9px] font-bold text-primary uppercase tracking-widest truncate w-40">{(interview.jobs as any)?.company_name}</p>
                                         </div>
                                     </div>
                                     <div className="flex gap-2 mt-4">
@@ -157,24 +192,35 @@ const CandidateDashboard: React.FC<CandidateDashboardProps> = ({ onNavigate, onO
                     )}
                 </section>
 
-                {/* Categorical Shortcuts */}
-                <section>
-                    <h2 className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-4 ml-1">Radar de Oportunidades</h2>
-                    <div className="grid grid-cols-2 gap-3 pb-6">
-                        <button onClick={() => onNavigate('swipe')} className="h-28 bg-primary text-secondary rounded-[2rem] flex flex-col items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-95 transition-all">
-                            <span className="material-symbols-outlined text-3xl font-black">bolt</span>
-                            <span className="text-[10px] font-black uppercase">Quick Swipe</span>
+                {/* Radar Segment */}
+                <section className="space-y-6">
+                    <h2 className="text-[10px] font-black text-white/30 uppercase tracking-widest px-1">Radar de Oportunidades</h2>
+                    <div className="flex items-center justify-center gap-4 relative z-10 h-72">
+                        {/* Quick Swipe - Yellow Hex */}
+                        <button
+                            onClick={() => onNavigate('swipe')}
+                            className="w-44 h-52 relative group transition-all duration-500 active:scale-90"
+                            style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}
+                        >
+                            <div className="absolute inset-0 bg-primary group-hover:scale-110 transition-transform duration-500" />
+                            <div className="relative z-10 flex flex-col items-center justify-center h-full p-6 text-center">
+                                <span className="material-symbols-outlined text-secondary text-4xl mb-4 font-black group-hover:scale-125 transition-transform duration-500">bolt</span>
+                                <span className="text-sm font-black text-secondary uppercase tracking-tighter leading-tight">QUICK<br />SWIPE</span>
+                            </div>
                         </button>
-                        <div className="grid grid-rows-2 gap-3">
-                            <button onClick={() => onNavigate('jobs')} className="bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center gap-2 active:scale-95 transition-all text-white/40 uppercase text-[9px] font-black">
-                                <span className="material-symbols-outlined text-sm">segment</span>
-                                Feed
-                            </button>
-                            <button onClick={() => onNavigate('profile')} className="bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center gap-2 active:scale-95 transition-all text-white/40 uppercase text-[9px] font-black">
-                                <span className="material-symbols-outlined text-sm">person</span>
-                                Perfil
-                            </button>
-                        </div>
+
+                        {/* Feed - Dark Hex */}
+                        <button
+                            onClick={() => onNavigate('jobs')}
+                            className="w-40 h-44 relative group transition-all duration-500 active:scale-90"
+                            style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}
+                        >
+                            <div className="absolute inset-0 bg-white/5 border border-white/10 backdrop-blur-md group-hover:bg-white/10 transition-colors" />
+                            <div className="relative z-10 flex flex-col items-center justify-center h-full p-4 text-center">
+                                <span className="material-symbols-outlined text-white/30 text-3xl mb-3 font-black group-hover:scale-110 transition-transform">segment</span>
+                                <span className="text-[10px] font-black text-white/50 uppercase tracking-widest">VAGAS</span>
+                            </div>
+                        </button>
                     </div>
                 </section>
             </div>

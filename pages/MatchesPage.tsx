@@ -63,7 +63,8 @@ const MatchesPage: React.FC<MatchesPageProps> = ({ onOpenChat, role = 'candidate
           availabilitySlots: m.availability_slots || [],
           timestamp: 'Agora',
           industry: m.jobs?.category || 'TI',
-          isVerified: true
+          isVerified: true,
+          jobStatus: m.jobs?.status || 'active'
         }));
         setMatches(mapped);
       }
@@ -128,11 +129,15 @@ const MatchesPage: React.FC<MatchesPageProps> = ({ onOpenChat, role = 'candidate
   }
 
   return (
-    <div className="flex flex-col min-h-full bg-secondary text-white relative overflow-hidden font-sans">
-      {/* Background Texture & Glow */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className={`absolute top-[-10%] left-[-10%] w-[50%] h-[50%] ${isRecruiter ? 'bg-blue-500/10' : 'bg-primary/10'} blur-[120px] rounded-full`}></div>
-        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+    <div className="flex flex-col min-h-full bg-[#0B0F1A] text-white relative overflow-hidden font-sans">
+      {/* AMBIENT BACKGROUND */}
+      <div className="absolute inset-0 pointer-events-none opacity-20">
+        <div className="absolute top-[10%] right-[-10%] w-[60%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full rotate-45" />
+        <div className="absolute bottom-[20%] left-[-10%] w-[50%] h-[50%] bg-primary/5 blur-[120px] rounded-full" />
+        <div className="absolute inset-0 opacity-[0.03]" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill-rule='evenodd' stroke='%23ffffff' stroke-width='1' fill='none'/%3E%3C/svg%3E")`,
+          backgroundSize: '30px 52px'
+        }} />
       </div>
 
       <header className="relative z-10 px-6 pb-10 flex items-center justify-between" style={{ paddingTop: 'calc(2.5rem + env(safe-area-inset-top))' }}>
@@ -173,7 +178,7 @@ const MatchesPage: React.FC<MatchesPageProps> = ({ onOpenChat, role = 'candidate
         </div>
       </header>
 
-      <main className="relative z-10 px-6 space-y-5 pb-10 overflow-y-auto scrollbar-hide flex-1">
+      <main className="relative z-10 px-6 pb-10 overflow-y-auto scrollbar-hide flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 content-start">
         {sortedMatches.map((match) => (
           <div key={match.id} className="group relative">
             {/* MATCH CARD */}
@@ -211,6 +216,11 @@ const MatchesPage: React.FC<MatchesPageProps> = ({ onOpenChat, role = 'candidate
                   <p className="text-xs font-bold text-white/40 uppercase tracking-widest mt-0.5">{match.companyName}</p>
                   <div className="flex items-center gap-2 mt-2">
                     <span className={`text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1 bg-white/5 border border-white/5 rounded-full ${roleColor}`}>{match.industry}</span>
+                    {match.jobStatus !== 'active' && (
+                      <span className="text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-full text-red-400">
+                        {match.jobStatus === 'closed' ? 'Encerrada' : 'Inativa'}
+                      </span>
+                    )}
                     <span className="text-[9px] font-bold text-white/20 uppercase tracking-tighter">{match.matchDate}</span>
                   </div>
                 </div>

@@ -23,14 +23,15 @@ const BottomNav: React.FC<BottomNavProps> = ({ activePage, onNavigate, role = 'c
   ];
 
   const recruiterTabs: { id: string; label: string; icon: string; central?: boolean }[] = [
-    { id: 'jobs', label: 'Início', icon: 'home' },
-    { id: 'swipe', label: 'Divulgar', icon: 'add_circle' },
+    { id: 'dashboard', label: 'Início', icon: 'home' },
+    { id: 'swipe', label: 'Abrir Vaga', icon: 'add_circle' },
+    { id: 'candidates', label: 'Match', icon: 'amp_stories', central: true },
     { id: 'matches', label: 'Chat', icon: 'chat_bubble' },
     { id: 'profile', label: 'Perfil', icon: 'person' },
   ];
 
   const tabs = isRecruiter ? recruiterTabs : candidateTabs;
-  const activeColor = isRecruiter ? '#60A5FA' : '#FACC15';
+  const activeColor = '#FACC15';
 
   return (
     <div
@@ -54,16 +55,32 @@ const BottomNav: React.FC<BottomNavProps> = ({ activePage, onNavigate, role = 'c
                 key={tab.id}
                 onClick={() => onNavigate(tab.id as Page)}
                 className={`
-                  relative flex items-center justify-center -mt-8
-                  w-16 h-16 rounded-full transition-all duration-500
-                  ${isActive
-                    ? `bg-gradient-to-br ${isRecruiter ? 'from-blue-500 to-blue-700' : 'from-yellow-400 to-yellow-600'} shadow-[0_10px_30px_${activeColor}66] scale-110`
-                    : 'bg-slate-800 border border-white/10 shadow-lg text-white/60 hover:text-white'}
+                  relative flex items-center justify-center -mt-10 mb-4
+                  w-20 h-24 transition-all duration-500 active:scale-90 group
                 `}
+                style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}
               >
-                <span className={`material-symbols-outlined text-[32px] ${isActive ? 'text-[#0B0F1A] font-black' : ''}`}>
+                {/* Hexagon Background */}
+                <div className={`
+                    absolute inset-0 transition-all duration-500
+                    ${isActive
+                    ? `bg-gradient-to-br from-primary via-yellow-500 to-orange-500 shadow-[0_15px_30px_${activeColor}66]`
+                    : 'bg-slate-800 border-2 border-white/5'}
+                `} />
+
+                {/* Inner Glow */}
+                {isActive && (
+                  <div className="absolute inset-0 animate-pulse bg-white/20 mix-blend-overlay" style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }} />
+                )}
+
+                <span className={`material-symbols-outlined text-[36px] relative z-10 ${isActive ? 'text-[#0B0F1A] font-black scale-110 drop-shadow-lg' : 'text-white/40 group-hover:text-white'} transition-all duration-300`}>
                   {tab.icon}
                 </span>
+
+                {/* Pulse Ring Stimulation */}
+                {isActive && (
+                  <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping -z-10 blur-xl" />
+                )}
               </button>
             );
           }
@@ -73,21 +90,22 @@ const BottomNav: React.FC<BottomNavProps> = ({ activePage, onNavigate, role = 'c
               key={tab.id}
               onClick={() => onNavigate(tab.id as Page)}
               className={`
-                flex flex-col items-center justify-center gap-1
-                w-12 h-12 rounded-2xl transition-all duration-300
-                ${isActive ? 'opacity-100' : 'opacity-40 hover:opacity-70'}
+                flex flex-col items-center justify-center gap-1.5
+                w-14 h-14 transition-all duration-300 relative
+                ${isActive ? 'opacity-100' : 'opacity-40 hover:opacity-100'}
               `}
             >
               <span className={`
-                  material-symbols-outlined text-[26px]
+                  material-symbols-outlined text-[28px]
                   ${isActive ? (isRecruiter ? 'text-blue-400' : 'text-primary') : 'text-white'}
+                  transition-transform duration-300 ${isActive ? 'scale-110 -translate-y-1' : 'scale-100'}
               `}>
                 {tab.icon}
               </span>
 
-              <span className={`text-[9px] font-bold uppercase tracking-wider ${isActive ? 'text-white scale-100' : 'text-white/0 scale-0 hidden'}`}>
-                {tab.label === 'Início' ? 'Home' : tab.label}
-              </span>
+              {isActive && (
+                <div className={`w-1 h-1 rounded-full ${isRecruiter ? 'bg-blue-400' : 'bg-primary'} shadow-[0_0_8px_${activeColor}] animate-in zoom-in duration-300`} />
+              )}
             </button>
           );
         })}

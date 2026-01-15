@@ -37,6 +37,7 @@ const JobsPage: React.FC = () => {
       const { data: jobsData, error } = await supabase
         .from('jobs')
         .select('*')
+        .eq('status', 'active')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -148,11 +149,15 @@ const JobsPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-full bg-secondary text-white relative overflow-hidden font-sans">
-      {/* Background Texture & Glow */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full"></div>
-        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+    <div className="flex flex-col min-h-full bg-[#0B0F1A] text-white relative overflow-hidden font-sans">
+      {/* AMBIENT BACKGROUND */}
+      <div className="absolute inset-0 pointer-events-none opacity-20">
+        <div className="absolute top-[10%] right-[-10%] w-[60%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full rotate-45" />
+        <div className="absolute bottom-[20%] left-[-10%] w-[50%] h-[50%] bg-primary/5 blur-[120px] rounded-full" />
+        <div className="absolute inset-0 opacity-[0.03]" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill-rule='evenodd' stroke='%23ffffff' stroke-width='1' fill='none'/%3E%3C/svg%3E")`,
+          backgroundSize: '30px 52px'
+        }} />
       </div>
 
       <div className="relative z-10 p-6 pt-10 flex-1 overflow-y-auto scrollbar-hide pb-20">

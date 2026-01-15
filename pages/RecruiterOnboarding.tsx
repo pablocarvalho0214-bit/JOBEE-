@@ -2,9 +2,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { JobeeSymbol } from '../components/JobeeIdentity';
+import { useToast } from '../context/ToastContext';
 
 interface RecruiterOnboardingProps {
     onComplete: () => void;
+    startStep?: number;
 }
 
 // Industry sectors list for analytics (alphabetically sorted)
@@ -112,34 +114,51 @@ const CITIES_BY_STATE: Record<string, string[]> = {
     'TO - Tocantins': ['Palmas', 'Araguaína', 'Gurupi', 'Porto Nacional', 'Paraíso do Tocantins']
 };
 
-const RecruiterOnboarding: React.FC<RecruiterOnboardingProps> = ({ onComplete }) => {
-    const [step, setStep] = useState(1);
+const RecruiterOnboarding: React.FC<RecruiterOnboardingProps> = ({ onComplete, startStep = 1 }) => {
+    // Stage 0: Initial Cache Load
+    const cache = (() => {
+        try {
+            const saved = localStorage.getItem('jobee_cache_onboarding');
+            return saved ? JSON.parse(saved) : null;
+        } catch { return null; }
+    })();
+
+    const [step, setStep] = useState(() => {
+        const saved = localStorage.getItem('onboarding_start_step');
+        if (saved) {
+            localStorage.removeItem('onboarding_start_step');
+            return parseInt(saved);
+        }
+        return startStep;
+    });
     const [loading, setLoading] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(!!cache?.db_subscription_status || !!cache?.onboarding_completed);
     const [uploadingLogo, setUploadingLogo] = useState(false);
     const [uploadingAvatar, setUploadingAvatar] = useState(false);
     const [cnpjError, setCnpjError] = useState('');
     const [whatsappError, setWhatsappError] = useState('');
+    const { showToast } = useToast();
 
     const logoInputRef = useRef<HTMLInputElement>(null);
     const avatarInputRef = useRef<HTMLInputElement>(null);
 
     const [formData, setFormData] = useState({
-        companyName: '',
-        legalName: '',
-        cnpj: '',
-        industry: '',
-        companySize: '',
-        bio: '',
-        website: '',
-        responsibleName: '',
-        responsibleRole: '',
-        whatsapp: '',
-        headquarters: '',
-        city: '',
-        customCity: '',
-        preferredModality: 'Híbrido',
-        companyLogo: '',
-        avatarUrl: ''
+        companyName: cache?.db_company_name || cache?.company_name || '',
+        legalName: cache?.db_metadata?.legalName || cache?.metadata?.legalName || '',
+        cnpj: cache?.db_metadata?.cnpj || cache?.metadata?.cnpj || '',
+        industry: cache?.industry || cache?.db_metadata?.industry || cache?.metadata?.industry || '',
+        companySize: cache?.db_metadata?.companySize || cache?.metadata?.companySize || '',
+        bio: cache?.db_metadata?.bio || cache?.metadata?.bio || '',
+        website: cache?.db_metadata?.website || cache?.metadata?.website || '',
+        responsibleName: cache?.db_full_name || cache?.full_name || '',
+        responsibleRole: cache?.db_metadata?.responsibleRole || cache?.metadata?.responsibleRole || '',
+        whatsapp: cache?.db_metadata?.whatsapp || cache?.metadata?.whatsapp || '',
+        headquarters: cache?.db_metadata?.headquarters || cache?.metadata?.headquarters || '',
+        city: cache?.db_metadata?.city || cache?.metadata?.city || '',
+        customCity: cache?.db_metadata?.customCity || cache?.metadata?.customCity || '',
+        preferredModality: cache?.db_metadata?.preferredModality || cache?.metadata?.preferredModality || 'Híbrido',
+        companyLogo: cache?.db_company_logo || cache?.company_logo_url || '',
+        avatarUrl: cache?.db_avatar_url || cache?.avatar_url || ''
     });
 
     // Get available cities based on selected state
@@ -249,6 +268,7 @@ const RecruiterOnboarding: React.FC<RecruiterOnboardingProps> = ({ onComplete })
 
             if (profile) {
                 // If metadata exists (as we saved the whole formData there), prioritize it
+                setIsEditMode(!!profile.onboarding_completed);
                 const existingData = profile.metadata || {};
                 setFormData({
                     companyName: profile.company_name || existingData.companyName || '',
@@ -314,7 +334,7 @@ const RecruiterOnboarding: React.FC<RecruiterOnboardingProps> = ({ onComplete })
 
         } catch (error: any) {
             console.error('Erro no upload:', error.message);
-            alert('Falha no upload. Verifique sua conexão.');
+            showToast('Falha no upload da imagem.', 'error');
         } finally {
             if (type === 'logo') setUploadingLogo(false); else setUploadingAvatar(false);
         }
@@ -353,23 +373,28 @@ const RecruiterOnboarding: React.FC<RecruiterOnboardingProps> = ({ onComplete })
                     updated_at: new Date().toISOString()
                 });
 
-            if (dbError) console.error('Database save error:', dbError.message);
+            if (dbError) throw dbError;
 
+            showToast('Perfil ativado com sucesso!', 'success');
             onComplete();
         } catch (error: any) {
-            alert('Erro ao salvar perfil: ' + error.message);
+            console.error('Erro ao salvar perfil:', error);
+            showToast('Erro ao salvar perfil. Tente novamente.', 'error');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-secondary text-white relative overflow-hidden font-sans">
-            {/* Background Texture & Glow */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-500/10 blur-[120px] rounded-full"></div>
-                <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary/5 blur-[120px] rounded-full"></div>
-                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+        <div className="flex flex-col min-h-screen bg-[#0B0F1A] text-white relative overflow-hidden font-sans">
+            {/* AMBIENT BACKGROUND */}
+            <div className="absolute inset-0 pointer-events-none opacity-20">
+                <div className="absolute top-[10%] right-[-10%] w-[60%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full rotate-45" />
+                <div className="absolute bottom-[20%] left-[-10%] w-[50%] h-[50%] bg-primary/5 blur-[120px] rounded-full" />
+                <div className="absolute inset-0 opacity-[0.03]" style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill-rule='evenodd' stroke='%23ffffff' stroke-width='1' fill='none'/%3E%3C/svg%3E")`,
+                    backgroundSize: '30px 52px'
+                }} />
             </div>
 
             <div className="relative z-10 p-6 pt-10 flex flex-col max-w-sm mx-auto w-full h-full shrink-0">
@@ -441,8 +466,11 @@ const RecruiterOnboarding: React.FC<RecruiterOnboardingProps> = ({ onComplete })
                                 </div>
                             </div>
 
-                            <button onClick={() => setStep(2)} className="w-full h-16 bg-blue-500 text-secondary font-black rounded-2xl uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl shadow-blue-500/20">
-                                Continuar
+                            <button
+                                onClick={() => isEditMode ? handleFinish() : setStep(2)}
+                                className="w-full h-16 bg-blue-500 text-secondary font-black rounded-2xl uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl shadow-blue-500/20 flex items-center justify-center gap-2"
+                            >
+                                {isEditMode ? (loading ? <div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin" /> : <>Salvar Alterações <span className="material-symbols-outlined font-black">check</span></>) : 'Continuar'}
                             </button>
                         </div>
                     )}
@@ -508,8 +536,11 @@ const RecruiterOnboarding: React.FC<RecruiterOnboardingProps> = ({ onComplete })
                                 <button onClick={() => setStep(1)} className="w-20 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white/40 hover:bg-white/10 transition-all">
                                     <span className="material-symbols-outlined">arrow_back</span>
                                 </button>
-                                <button onClick={() => setStep(3)} className="flex-1 h-16 bg-blue-500 text-secondary font-black rounded-2xl uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl shadow-blue-500/20">
-                                    Próximo
+                                <button
+                                    onClick={() => isEditMode ? handleFinish() : setStep(3)}
+                                    className="flex-1 h-16 bg-blue-500 text-secondary font-black rounded-2xl uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl shadow-blue-500/20 flex items-center justify-center gap-2"
+                                >
+                                    {isEditMode ? (loading ? <div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin" /> : <>Salvar Alterações <span className="material-symbols-outlined font-black">check</span></>) : 'Próximo'}
                                 </button>
                             </div>
                         </div>
@@ -563,8 +594,11 @@ const RecruiterOnboarding: React.FC<RecruiterOnboardingProps> = ({ onComplete })
                                 <button onClick={() => setStep(2)} className="w-20 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white/40 hover:bg-white/10 transition-all">
                                     <span className="material-symbols-outlined">arrow_back</span>
                                 </button>
-                                <button onClick={() => setStep(4)} className="flex-1 h-16 bg-blue-500 text-secondary font-black rounded-2xl uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl shadow-blue-500/20">
-                                    Próximo
+                                <button
+                                    onClick={() => isEditMode ? handleFinish() : setStep(4)}
+                                    className="flex-1 h-16 bg-blue-500 text-secondary font-black rounded-2xl uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl shadow-blue-500/20 flex items-center justify-center gap-2"
+                                >
+                                    {isEditMode ? (loading ? <div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin" /> : <>Salvar Alterações <span className="material-symbols-outlined font-black">check</span></>) : 'Próximo'}
                                 </button>
                             </div>
                         </div>

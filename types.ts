@@ -1,5 +1,5 @@
 
-export type Page = 'login' | 'dashboard' | 'jobs' | 'swipe' | 'matches' | 'profile' | 'chat' | 'reset-password' | 'onboarding' | 'brand';
+export type Page = 'login' | 'dashboard' | 'jobs' | 'swipe' | 'matches' | 'profile' | 'chat' | 'reset-password' | 'onboarding' | 'brand' | 'candidates';
 
 export interface Job {
   id: string;
@@ -55,6 +55,9 @@ export interface Match {
   companyName: string;
   jobTitle: string;
   companyLogo: string;
+  candidateName?: string;
+  candidateRole?: string;
+  candidateAvatar?: string;
   industry: string;
   timestamp: string;
   isVerified?: boolean;

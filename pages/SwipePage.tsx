@@ -33,11 +33,27 @@ const SwipePage: React.FC = () => {
         setUserTier(profile.subscription_tier || 'nectar');
       }
 
-      // 2. Fetch Jobs
-      const { data, error } = await supabase
+      // 2. Fetch swiped job IDs by Candidate to exclude
+      const { data: swipedData } = await supabase
+        .from('matches')
+        .select('job_id')
+        .eq('candidate_id', user.id)
+        .or('candidate_liked.eq.true,candidate_rejected.eq.true');
+
+      const swipedIds = (swipedData || []).map(m => m.job_id);
+
+      // 3. Fetch Jobs
+      let query = supabase
         .from('jobs')
         .select('*')
+        .eq('status', 'active')
         .order('created_at', { ascending: false });
+
+      if (swipedIds.length > 0) {
+        query = query.not('id', 'in', `(${swipedIds.join(',')})`);
+      }
+
+      const { data, error } = await query;
 
       if (data && !error) {
         // Map DB fields to Job interface and Calculate Real Match Score
@@ -60,26 +76,22 @@ const SwipePage: React.FC = () => {
             category: j.category || 'Geral',
             xpBonus: 50,
             bookmarked: false,
-            // ... rest of fields inherited from ...j
           } as any;
         });
 
-        // 3. Filter by Radius (Real Calculation)
+        // 4. Filter by Radius (Real Calculation)
         const radiusLimit = profile?.search_radius || 50;
         const filteredJobs = mappedJobs.filter(j => {
           if (j.distance !== undefined) {
             return j.distance <= radiusLimit;
           }
-          return true; // Keep jobs without coords for now or until data is migrated
+          return true;
         });
 
-        // 4. Sort by Match Score + Sponsorship
+        // 5. Sort by Match Score + Sponsorship
         filteredJobs.sort((a, b) => {
-          // Sponsored jobs with higher priority come first
           if (a.is_sponsored && !b.is_sponsored) return -1;
           if (!a.is_sponsored && b.is_sponsored) return 1;
-
-          // If both are sponsored or none are, sort by match score
           return b.matchScore - a.matchScore;
         });
 
@@ -193,11 +205,11 @@ const SwipePage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-full bg-secondary text-white relative overflow-hidden font-sans">
+    <div className="flex flex-col min-h-full bg-secondary text-white relative overflow-hidden font-sans max-w-md mx-auto w-full shadow-2xl md:shadow-none">
       {/* Background Texture & Glow */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[20%] right-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full"></div>
-        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+        <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]"></div>
       </div>
 
       {/* Header */}
@@ -265,9 +277,12 @@ const SwipePage: React.FC = () => {
               </div>
             </div>
 
-            <div className={`absolute top-4 right-4 ${current.is_sponsored ? 'bg-primary text-secondary' : 'bg-primary/20 text-primary'} border border-primary/30 text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1 backdrop-blur-xl transition-colors`}>
-              <span className="material-symbols-outlined text-[12px]">bolt</span>
-              {current.matchScore}%
+            <div
+              className={`absolute top-4 right-4 ${current.is_sponsored ? 'bg-primary text-secondary' : 'bg-[#0F172A]/80 text-primary'} border border-primary/30 text-[10px] font-black w-14 h-16 shadow-2xl flex flex-col items-center justify-center backdrop-blur-xl transition-all hover:scale-110 z-30`}
+              style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}
+            >
+              <span className="material-symbols-outlined text-[14px] mb-0.5">bolt</span>
+              <span className="leading-none">{current.matchScore}%</span>
             </div>
           </div>
 
@@ -392,24 +407,32 @@ const SwipePage: React.FC = () => {
       </div>
 
       {/* Action Buttons */}
-      <div className={`fixed bottom-28 left-0 right-0 px-8 flex items-center justify-center gap-6 z-30`}>
+      <div className={`absolute bottom-28 left-0 right-0 px-8 flex items-center justify-center gap-4 z-30`}>
         <button
           onClick={handleSkip}
-          className="w-16 h-16 flex items-center justify-center rounded-3xl bg-white/5 border border-white/10 text-white/20 transition-all active:scale-90 hover:text-white"
+          className="w-16 h-20 flex items-center justify-center text-white/20 transition-all active:scale-90 hover:text-white group relative"
+          style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}
         >
-          <span className="material-symbols-outlined text-4xl">close</span>
+          <div className="absolute inset-0 bg-white/5 border border-white/10 group-hover:bg-white/10" />
+          <span className="material-symbols-outlined text-3xl relative z-10">close</span>
         </button>
+
         <button
           onClick={handleLike}
-          className="w-20 h-20 flex items-center justify-center rounded-[2.5rem] bg-primary text-secondary shadow-2xl shadow-primary/40 transition-all active:scale-95 group"
+          className="w-24 h-28 flex items-center justify-center text-secondary shadow-2xl transition-all active:scale-95 group relative"
+          style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}
         >
-          <span className="material-symbols-outlined text-5xl font-black group-hover:scale-110 transition-transform">favorite</span>
+          <div className="absolute inset-0 bg-primary shadow-[0_0_30px_rgba(250,204,21,0.4)]" />
+          <span className="material-symbols-outlined text-5xl font-black group-hover:scale-110 transition-transform relative z-10">favorite</span>
         </button>
+
         <button
           onClick={handleBookmark}
-          className="w-16 h-16 flex items-center justify-center rounded-3xl bg-white/5 border border-white/10 text-white/20 transition-all active:scale-90 hover:text-primary active:bg-primary/10"
+          className="w-16 h-20 flex items-center justify-center text-white/20 transition-all active:scale-90 hover:text-primary group relative"
+          style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}
         >
-          <span className="material-symbols-outlined text-3xl">bookmark</span>
+          <div className="absolute inset-0 bg-white/5 border border-white/10 group-hover:bg-white/10" />
+          <span className="material-symbols-outlined text-2xl relative z-10">bookmark</span>
         </button>
       </div>
     </div>

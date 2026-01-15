@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useKeyboardStatus } from '../hooks/useKeyboardStatus';
 import { JobeeSymbol } from '../components/JobeeIdentity';
+import { RadiusMap } from '../components/RadiusMap';
 import { supabase } from '../services/supabaseClient';
+import { Geolocation } from '@capacitor/geolocation';
 
 interface CreateJobPageProps {
     onNavigate?: (page: any) => void;
@@ -42,6 +44,34 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
     const [companyLogo, setCompanyLogo] = useState('');
     const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
+    // Swipe interaction
+    const [dragY, setDragY] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const startYRef = React.useRef(0);
+
+    const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
+        setIsDragging(true);
+        const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
+        startYRef.current = clientY - dragY;
+    };
+
+    const handleTouchMove = (e: React.TouchEvent | React.MouseEvent) => {
+        if (!isDragging) return;
+        const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
+        const newY = Math.max(0, clientY - startYRef.current);
+        setDragY(newY);
+    };
+
+    const handleTouchEnd = () => {
+        setIsDragging(false);
+        if (dragY > 150) {
+            onNavigate?.('jobs');
+            setDragY(0);
+        } else {
+            setDragY(0);
+        }
+    };
+
     // Load state from localStorage on mount
     useEffect(() => {
         const savedState = localStorage.getItem('jobee_create_job_state');
@@ -61,7 +91,6 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
                 setShowRemuneration(parsed.showRemuneration ?? true);
                 setIsConfidential(parsed.isConfidential || false);
                 setHiringRadius(parsed.hiringRadius || 50);
-                // ... restore other fields as needed
             } catch (e) {
                 console.error('Failed to load saved job state', e);
             }
@@ -122,38 +151,30 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
         if (step > 1) setStep(step - 1);
     };
 
-    const getCurrentLocation = () => {
-        if (!navigator.geolocation) {
-            alert('Geolocalização não é suportada.');
-            return;
-        }
-
+    const getCurrentLocation = async () => {
         setLoading(true);
-        navigator.geolocation.getCurrentPosition(
-            async (position) => {
-                const { latitude, longitude } = position.coords;
-                setLatitude(latitude);
-                setLongitude(longitude);
+        try {
+            const position = await Geolocation.getCurrentPosition({
+                enableHighAccuracy: true
+            });
 
-                try {
-                    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
-                    const data = await response.json();
-                    if (data.address) {
-                        const city = data.address.city || data.address.town || data.address.suburb || '';
-                        const state = data.address.state || '';
-                        setLocation(`${city}${city && state ? ' / ' : ''}${state}`);
-                    }
-                } catch (error) {
-                    console.error('Error in reverse geocoding:', error);
-                } finally {
-                    setLoading(false);
-                }
-            },
-            () => {
-                setLoading(false);
-                alert('Erro ao obter localização.');
+            const { latitude, longitude } = position.coords;
+            setLatitude(latitude);
+            setLongitude(longitude);
+
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+            const data = await response.json();
+            if (data.address) {
+                const city = data.address.city || data.address.town || data.address.suburb || '';
+                const state = data.address.state || '';
+                setLocation(`${city}${city && state ? ' / ' : ''}${state}`);
             }
-        );
+        } catch (error) {
+            console.error('Error getting location:', error);
+            alert('Não foi possível obter sua localização. Verifique se o GPS está ativo e se deu permissão ao app.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleAddressSearch = async (query: string) => {
@@ -193,7 +214,6 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
     };
 
     const calculateTotalRemuneration = () => {
-        // Remove everything that is not a digit or a comma
         const cleanString = salary.replace(/[^\d,]/g, '').replace(',', '.');
         const baseSalary = parseFloat(cleanString) || 0;
         const benefitsSum: number = (Object.values(benefitsValues) as number[]).reduce((a: number, b: number) => a + b, 0);
@@ -287,9 +307,7 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
             const { data, error } = await supabase.from('jobs').insert(jobData).select().single();
             if (error) throw error;
 
-            // Clear saved state on success
             localStorage.removeItem('jobee_create_job_state');
-
             setPublishedJob(data);
             setPreviewMode(false);
         } catch (err) {
@@ -299,132 +317,6 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
             setLoading(false);
         }
     };
-
-    if (publishedJob) {
-        return (
-            <div className="flex flex-col h-full bg-secondary text-white p-6 pt-10 justify-center items-center text-center">
-                <div className="w-24 h-24 bg-green-500 rounded-[2.5rem] flex items-center justify-center mb-8 shadow-2xl shadow-green-500/20 animate-bounce">
-                    <JobeeSymbol size={48} mode="dark" />
-                </div>
-                <h1 className="text-3xl font-black uppercase tracking-tighter mb-2">Vaga <span className="text-green-500 italic">Ativada!</span></h1>
-                <p className="text-xs font-bold text-white/40 uppercase tracking-widest mb-12">As abelhas já estão em busca do polen.</p>
-                <div className="w-full space-y-4 max-w-xs">
-                    <button onClick={() => onNavigate?.('jobs')} className="w-full h-16 bg-green-500 text-secondary font-black rounded-2xl shadow-xl uppercase tracking-widest">Ir para Dashboard</button>
-                    <button onClick={() => {
-                        setPublishedJob(null);
-                        setStep(1);
-                        setPreviewMode(false);
-                        localStorage.removeItem('jobee_create_job_state'); // Ensure clean start
-                        // Reset all states manually if needed, or rely on the empty localStorage + mount logic if we forced a reload, but manual reset is better here for SPA
-                        setTitle(''); setLocation(''); setSalary(''); setDescription('');
-                        setRequiredSkills(''); setExperienceYears(''); setSelectedBenefits([]); setBenefitsValues({});
-                    }} className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest">Criar Outra Vaga</button>
-                </div>
-            </div>
-        );
-    }
-
-    if (previewMode) {
-        const displayData = {
-            title,
-            location,
-            salary,
-            description,
-            type: jobType,
-            required_skills: requiredSkills.split(',').map(s => s.trim()).filter(s => s !== ''),
-            experience_years: experienceYears,
-            benefits: selectedBenefits,
-            work_schedule: `${workStart} às ${workEnd}`,
-            lunch_time: lunchTime,
-            work_days: workDaysType === '2a6a' ? 'Segunda a Sexta' : workDaysType === '2aSab' ? 'Segunda a Sábado' : customWorkDays,
-            weekly_hours: weeklyHoursType === 'Outro' ? `${customWeeklyHours}h` : weeklyHoursType,
-            interview_model: interviewModel,
-            scheduling_mode: schedulingMode,
-            interview_detail: interviewDetail,
-            benefits_values: benefitsValues,
-            total_remuneration: calculateTotalRemuneration().toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-            show_remuneration: showRemuneration
-        };
-
-        return (
-            <div className="flex flex-col h-full bg-secondary text-white relative overflow-hidden font-sans p-6" style={{ paddingTop: 'calc(2.5rem + env(safe-area-inset-top))' }}>
-                <header className="mb-6 shrink-0 text-center">
-                    <h2 className="text-2xl font-black uppercase tracking-tighter">Revisão da <span className="text-primary italic">Vaga</span></h2>
-                </header>
-
-                <div className="flex-1 min-h-0 bg-white/10 rounded-[2.5rem] border border-white/20 overflow-y-auto custom-scrollbar p-6 space-y-6">
-                    <div className="text-center">
-                        <h3 className="text-2xl font-black uppercase tracking-tighter mb-1">{displayData.title}</h3>
-                        <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{location}</p>
-                        <div className="mt-2 flex flex-col items-center">
-                            {displayData.show_remuneration ? (
-                                <>
-                                    <p className="text-xl font-black text-green-400">{displayData.total_remuneration}</p>
-                                    <p className="text-[8px] font-bold text-white/30 uppercase tracking-widest">Remuneração Total Estimada</p>
-                                    <p className="text-[9px] text-white/20 mt-1">(Salário: {salary} + Benefícios)</p>
-                                </>
-                            ) : (
-                                <p className="text-lg font-black text-white">{salary}</p>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="space-y-4">
-                        <div className="space-y-1">
-                            <h4 className="text-[9px] font-black text-primary uppercase tracking-widest flex items-center gap-2">
-                                <span className="material-symbols-outlined text-xs">description</span> Descrição
-                            </h4>
-                            <p className="text-[11px] text-white/60 leading-relaxed font-medium">{displayData.description}</p>
-                        </div>
-
-                        <div className="space-y-2">
-                            <h4 className="text-[9px] font-black text-primary uppercase tracking-widest">Requisitos</h4>
-                            <div className="flex flex-wrap gap-1">
-                                {displayData.required_skills.map(s => (
-                                    <span key={s} className="px-3 py-1 bg-white/5 rounded-lg text-[9px] font-bold">{s}</span>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <h4 className="text-[9px] font-black text-green-400 uppercase tracking-widest">Benefícios</h4>
-                            <div className="flex flex-col gap-2">
-                                {displayData.benefits.map(b => (
-                                    <div key={b} className="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/5">
-                                        <div className="flex items-center gap-2">
-                                            <span className="material-symbols-outlined text-green-400 text-[14px]">check_circle</span>
-                                            <span className="text-[10px] font-black uppercase text-white/70">{b}</span>
-                                        </div>
-                                        {displayData.benefits_values[b] > 0 && (
-                                            <span className="text-[10px] font-bold text-green-400">
-                                                +{displayData.benefits_values[b].toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                                            </span>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="pt-6 space-y-3 shrink-0">
-                    <button
-                        onClick={handleConfirmPublish}
-                        disabled={loading}
-                        className="w-full h-16 bg-primary text-secondary font-black rounded-2xl shadow-xl uppercase tracking-widest flex items-center justify-center gap-2"
-                    >
-                        {loading ? <div className="w-5 h-5 border-2 border-secondary/30 border-t-secondary rounded-full animate-spin" /> : 'Publicar Vaga'}
-                    </button>
-                    <button
-                        onClick={() => setPreviewMode(false)}
-                        className="w-full h-12 bg-white/5 text-white/40 font-black rounded-2xl uppercase tracking-widest text-[9px]"
-                    >
-                        Voltar para Ajustes
-                    </button>
-                </div>
-            </div>
-        );
-    }
 
     const renderStep = () => {
         switch (step) {
@@ -474,7 +366,6 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
                                         </div>
                                     </button>
                                 </div>
-
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-white/70 uppercase ml-1">Título da Oportunidade</label>
                                     <input
@@ -491,12 +382,12 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
                 );
             case 2:
                 return (
-                    <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-8 duration-500">
-                        <header className="mb-8 text-center sm:text-left">
+                    <div className="flex-1 flex flex-col min-h-0 animate-in fade-in slide-in-from-right-8 duration-500">
+                        <header className="mb-6 text-center sm:text-left shrink-0">
                             <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Passo 02/07</span>
                             <h1 className="text-2xl font-black uppercase tracking-tighter">Onde está o <span className="text-primary italic">Enxame?</span></h1>
                         </header>
-                        <div className="space-y-6 flex-1">
+                        <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 pb-32 min-h-0">
                             <div className="bg-white/5 p-6 rounded-3xl border border-white/10 space-y-6">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-white/70 uppercase ml-1">Modalidade</label>
@@ -528,19 +419,69 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
                                         </button>
                                     </div>
                                 </div>
-                                <div className="space-y-3">
+                                <div className="space-y-4">
                                     <div className="flex justify-between items-center px-1">
-                                        <label className="text-[10px] font-black text-white/40 uppercase">Raio de Radar</label>
+                                        <label className="text-[10px] font-black text-white/40 uppercase">Raio de Contratação</label>
                                         <span className="text-xs font-black text-primary">{hiringRadius} km</span>
                                     </div>
+
+                                    {/* Real Interactive Map */}
+                                    {latitude && longitude ? (
+                                        <div
+                                            className="relative w-full aspect-square max-w-[260px] mx-auto rounded-3xl overflow-hidden border-2 border-white/10 shadow-2xl shrink-0"
+                                            onMouseDown={(e) => e.stopPropagation()}
+                                            onTouchStart={(e) => e.stopPropagation()}
+                                            onPointerDown={(e) => e.stopPropagation()}
+                                        >
+                                            <RadiusMap
+                                                latitude={latitude}
+                                                longitude={longitude}
+                                                radius={hiringRadius}
+                                                className="w-full h-full"
+                                                onLocationChange={(lat, lng, address) => {
+                                                    setLatitude(lat);
+                                                    setLongitude(lng);
+                                                    if (address) {
+                                                        setLocation(address);
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="relative w-full aspect-square max-w-[280px] mx-auto bg-gradient-to-br from-white/5 to-transparent rounded-3xl border border-white/10 flex items-center justify-center">
+                                            <div className="text-center p-6">
+                                                <span className="material-symbols-outlined text-white/20 text-5xl mb-3">location_off</span>
+                                                <p className="text-[10px] font-black text-white/30 uppercase tracking-widest">Defina a localização primeiro</p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Slider */}
                                     <input
                                         type="range"
                                         min="1"
                                         max="500"
                                         value={hiringRadius}
                                         onChange={(e) => setHiringRadius(parseInt(e.target.value))}
-                                        className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary"
+                                        className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-primary"
                                     />
+
+                                    {/* Quick Presets */}
+                                    <div className="flex gap-2 justify-center flex-wrap">
+                                        {[1, 5, 10, 20].map((preset) => (
+                                            <button
+                                                key={preset}
+                                                type="button"
+                                                onClick={() => setHiringRadius(preset)}
+                                                className={`px-4 py-3 rounded-2xl text-[9px] font-black uppercase transition-all ${hiringRadius === preset
+                                                    ? 'bg-primary text-secondary'
+                                                    : 'bg-white/5 text-white/40 border border-white/10'
+                                                    }`}
+                                            >
+                                                {preset}km
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -635,7 +576,6 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
                                     </button>
                                 ))}
                             </div>
-
                             {selectedBenefits.length > 0 && (
                                 <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
                                     <h3 className="text-[10px] font-black text-white/40 uppercase tracking-widest border-b border-white/10 pb-2">Valores dos Benefícios (Opcional)</h3>
@@ -654,7 +594,6 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
                                             </div>
                                         </div>
                                     ))}
-
                                     <div className="bg-green-500/10 p-5 rounded-3xl border border-green-500/20 mt-4 space-y-3">
                                         <div className="flex justify-between items-center">
                                             <div>
@@ -665,7 +604,6 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
                                                 {calculateTotalRemuneration().toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                             </p>
                                         </div>
-
                                         <div className="flex items-center justify-between pt-3 border-t border-green-500/20">
                                             <label className="text-[9px] font-bold text-white/60 uppercase">Divulgar este valor em destaque?</label>
                                             <button
@@ -767,18 +705,123 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
         }
     };
 
-    return (
-        <div className="flex flex-col h-full bg-secondary text-white relative overflow-hidden font-sans">
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-[10%] right-[-10%] w-[50%] h-[50%] bg-blue-500/10 blur-[120px] rounded-full"></div>
-                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-            </div>
+    const renderContent = () => {
+        if (publishedJob) {
+            return (
+                <div className="flex flex-col h-full bg-secondary text-white p-6 pt-10 justify-center items-center text-center">
+                    <div className="w-24 h-24 bg-green-500 rounded-[2.5rem] flex items-center justify-center mb-8 shadow-2xl shadow-green-500/20 animate-bounce">
+                        <JobeeSymbol size={48} mode="dark" />
+                    </div>
+                    <h1 className="text-3xl font-black uppercase tracking-tighter mb-2">Vaga <span className="text-green-500 italic">Ativada!</span></h1>
+                    <p className="text-xs font-bold text-white/40 uppercase tracking-widest mb-12">As abelhas já estão em busca do polen.</p>
+                    <div className="w-full space-y-4 max-w-xs">
+                        <button onClick={() => onNavigate?.('dashboard')} className="w-full h-16 bg-green-500 text-secondary font-black rounded-2xl shadow-xl uppercase tracking-widest">Ir para Dashboard</button>
+                        <button onClick={() => {
+                            setPublishedJob(null);
+                            setStep(1);
+                            setPreviewMode(false);
+                            localStorage.removeItem('jobee_create_job_state');
+                            setTitle(''); setLocation(''); setSalary(''); setDescription('');
+                            setRequiredSkills(''); setExperienceYears(''); setSelectedBenefits([]); setBenefitsValues({});
+                        }} className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest">Criar Outra Vaga</button>
+                    </div>
+                </div>
+            );
+        }
 
+        if (previewMode) {
+            const displayData = {
+                title,
+                location,
+                salary,
+                description,
+                type: jobType,
+                required_skills: requiredSkills.split(',').map(s => s.trim()).filter(s => s !== ''),
+                experience_years: experienceYears,
+                benefits: selectedBenefits,
+                work_schedule: `${workStart} às ${workEnd}`,
+                lunch_time: lunchTime,
+                work_days: workDaysType === '2a6a' ? 'Segunda a Sexta' : workDaysType === '2aSab' ? 'Segunda a Sábado' : customWorkDays,
+                weekly_hours: weeklyHoursType === 'Outro' ? `${customWeeklyHours}h` : weeklyHoursType,
+                interview_model: interviewModel,
+                scheduling_mode: schedulingMode,
+                interview_detail: interviewDetail,
+                benefits_values: benefitsValues,
+                total_remuneration: calculateTotalRemuneration().toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+                show_remuneration: showRemuneration
+            };
+
+            return (
+                <div className="flex flex-col h-full p-6" style={{ paddingTop: 'calc(2.5rem + env(safe-area-inset-top))' }}>
+                    <header className="mb-6 shrink-0 text-center">
+                        <h2 className="text-2xl font-black uppercase tracking-tighter">Revisão da <span className="text-primary italic">Vaga</span></h2>
+                    </header>
+                    <div className="flex-1 min-h-0 bg-white/10 rounded-[2.5rem] border border-white/20 overflow-y-auto scrollbar-hide p-6 space-y-6">
+                        <div className="text-center">
+                            <h3 className="text-2xl font-black uppercase tracking-tighter mb-1">{displayData.title}</h3>
+                            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{location}</p>
+                            <div className="mt-2 flex flex-col items-center">
+                                {displayData.show_remuneration ? (
+                                    <>
+                                        <p className="text-xl font-black text-green-400">{displayData.total_remuneration}</p>
+                                        <p className="text-[8px] font-bold text-white/30 uppercase tracking-widest">Remuneração Total Estimada</p>
+                                        <p className="text-[9px] text-white/20 mt-1">(Salário: {salary} + Benefícios)</p>
+                                    </>
+                                ) : (
+                                    <p className="text-lg font-black text-white">{salary}</p>
+                                )}
+                            </div>
+                        </div>
+                        <div className="space-y-4">
+                            <div className="space-y-1">
+                                <h4 className="text-[9px] font-black text-primary uppercase tracking-widest flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-xs">description</span> Descrição
+                                </h4>
+                                <p className="text-[11px] text-white/60 leading-relaxed font-medium">{displayData.description}</p>
+                            </div>
+                            <div className="space-y-2">
+                                <h4 className="text-[9px] font-black text-primary uppercase tracking-widest">Requisitos</h4>
+                                <div className="flex flex-wrap gap-1">
+                                    {displayData.required_skills.map(s => (
+                                        <span key={s} className="px-3 py-1 bg-white/5 rounded-lg text-[9px] font-bold">{s}</span>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <h4 className="text-[9px] font-black text-green-400 uppercase tracking-widest">Benefícios</h4>
+                                <div className="flex flex-col gap-2">
+                                    {displayData.benefits.map(b => (
+                                        <div key={b} className="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/5">
+                                            <div className="flex items-center gap-2">
+                                                <span className="material-symbols-outlined text-green-400 text-[14px]">check_circle</span>
+                                                <span className="text-[10px] font-black uppercase text-white/70">{b}</span>
+                                            </div>
+                                            {displayData.benefits_values[b] > 0 && (
+                                                <span className="text-[10px] font-bold text-green-400">
+                                                    +{displayData.benefits_values[b].toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                                </span>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="pt-6 space-y-3 shrink-0">
+                        <button onClick={handleConfirmPublish} disabled={loading} className="w-full h-16 bg-primary text-secondary font-black rounded-2xl shadow-xl uppercase tracking-widest flex items-center justify-center gap-2">
+                            {loading ? <div className="w-5 h-5 border-2 border-secondary/30 border-t-secondary rounded-full animate-spin" /> : 'Publicar Vaga'}
+                        </button>
+                        <button onClick={() => setPreviewMode(false)} className="w-full h-12 bg-white/5 text-white/40 font-black rounded-2xl uppercase tracking-widest text-[9px]">Voltar para Ajustes</button>
+                    </div>
+                </div>
+            );
+        }
+
+        return (
             <div className="relative z-10 flex flex-col h-full p-6" style={{ paddingTop: 'calc(2.5rem + env(safe-area-inset-top))' }}>
                 <div className="flex-1 min-h-0">
                     {renderStep()}
                 </div>
-
                 {!isKeyboardOpen && (
                     <div className="pt-6 shrink-0 flex gap-4">
                         {step > 1 && (
@@ -786,10 +829,7 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
                                 <span className="material-symbols-outlined">arrow_back</span>
                             </button>
                         )}
-                        <button
-                            onClick={nextStep}
-                            className="flex-1 h-16 bg-primary text-secondary font-black rounded-2xl shadow-xl shadow-primary/20 uppercase tracking-widest flex items-center justify-center gap-2 group"
-                        >
+                        <button onClick={nextStep} className="flex-1 h-16 bg-primary text-secondary font-black rounded-2xl shadow-xl shadow-primary/20 uppercase tracking-widest flex items-center justify-center gap-2 group">
                             {step === totalSteps ? (
                                 <>
                                     <span className="material-symbols-outlined font-black">visibility</span>
@@ -798,22 +838,43 @@ const CreateJobPage: React.FC<CreateJobPageProps> = ({ onNavigate }) => {
                             ) : (
                                 <>
                                     Continuar
-                                    <span className="material-symbols-outlined font-black group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                                    <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
                                 </>
                             )}
                         </button>
                     </div>
                 )}
-
-                {!isKeyboardOpen && (
-                    <div className="mt-6 flex justify-center gap-1.5 shrink-0 hide-when-short">
-                        {[...Array(totalSteps)].map((_, i) => (
-                            <div key={i} className={`h-1 rounded-full transition-all duration-500 ${step === i + 1 ? 'w-8 bg-primary shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'w-2 bg-white/10'}`} />
-                        ))}
-                    </div>
-                )}
             </div>
-        </div >
+        );
+    };
+
+    return (
+        <div
+            className={`flex flex-col h-full bg-[#0B0F1A] text-white relative overflow-hidden font-sans ${!isDragging ? 'transition-transform duration-300' : ''}`}
+            style={{ transform: `translateY(${dragY}px)`, cursor: isDragging ? 'grabbing' : 'default' }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onMouseDown={handleTouchStart}
+            onMouseMove={handleTouchMove}
+            onMouseUp={handleTouchEnd}
+            onMouseLeave={handleTouchEnd}
+        >
+            {/* AMBIENT BACKGROUND */}
+            <div className="absolute inset-0 pointer-events-none opacity-20">
+                <div className="absolute top-[10%] right-[-10%] w-[60%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full rotate-45" />
+                <div className="absolute bottom-[20%] left-[-10%] w-[50%] h-[50%] bg-primary/5 blur-[120px] rounded-full" />
+                <div className="absolute inset-0 opacity-[0.03]" style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill-rule='evenodd' stroke='%23ffffff' stroke-width='1' fill='none'/%3E%3C/svg%3E")`,
+                    backgroundSize: '30px 52px'
+                }} />
+            </div>
+
+            {/* DRAG HANDLE */}
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 w-12 h-1 bg-white/10 rounded-full z-[100] pointer-events-none" />
+
+            {renderContent()}
+        </div>
     );
 };
 

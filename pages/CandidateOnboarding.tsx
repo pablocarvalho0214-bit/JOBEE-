@@ -3,9 +3,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { JobeeSymbol } from '../components/JobeeIdentity';
 import { useKeyboardStatus } from '../hooks/useKeyboardStatus';
+import { useToast } from '../context/ToastContext';
 
 interface CandidateOnboardingProps {
     onComplete: () => void;
+    startStep?: number;
 }
 
 const SKILL_OPTIONS = [
@@ -22,30 +24,47 @@ const TOOL_OPTIONS = [
     'Figma', 'Slack', 'Jira', 'Postman', 'Docker', 'Kubernetes', 'Git/GitHub', 'Zapier', 'Notion', 'Excel Avançado', 'Power BI', 'Google Analytics', 'CRM (Salesforce/Hubspot)'
 ];
 
-const CandidateOnboarding: React.FC<CandidateOnboardingProps> = ({ onComplete }) => {
-    const [step, setStep] = useState(1);
+const CandidateOnboarding: React.FC<CandidateOnboardingProps> = ({ onComplete, startStep = 1 }) => {
+    // Stage 0: Initial Cache Load
+    const cache = (() => {
+        try {
+            const saved = localStorage.getItem('jobee_cache_onboarding');
+            return saved ? JSON.parse(saved) : null;
+        } catch { return null; }
+    })();
+
+    const [step, setStep] = useState(() => {
+        const saved = localStorage.getItem('onboarding_start_step');
+        if (saved) {
+            localStorage.removeItem('onboarding_start_step');
+            return parseInt(saved);
+        }
+        return startStep;
+    });
     const { isKeyboardOpen } = useKeyboardStatus();
     const [loading, setLoading] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(!!cache?.db_subscription_status || !!cache?.onboarding_completed);
     const [uploadingAvatar, setUploadingAvatar] = useState(false);
+    const { showToast } = useToast();
     const avatarInputRef = useRef<HTMLInputElement>(null);
 
     const [formData, setFormData] = useState({
-        fullName: '',
-        headline: '',
-        bio: '',
-        skills: [] as string[],
-        tools: [] as string[],
-        targetRole: '',
-        targetIndustry: 'Tecnologia',
-        experienceLevel: 'Junior',
-        salaryExpectation: '',
-        preferredModality: 'Híbrido',
-        location: '',
-        whatsapp: '',
-        avatarUrl: '',
-        searchRadius: 50,
-        latitude: null as number | null,
-        longitude: null as number | null
+        fullName: cache?.db_full_name || cache?.full_name || '',
+        headline: cache?.db_metadata?.headline || cache?.metadata?.headline || '',
+        bio: cache?.db_metadata?.bio || cache?.metadata?.bio || '',
+        skills: cache?.db_skills || cache?.skills || [] as string[],
+        tools: cache?.db_metadata?.tools || cache?.metadata?.tools || [] as string[],
+        targetRole: cache?.target_role || cache?.db_metadata?.targetRole || cache?.metadata?.targetRole || '',
+        targetIndustry: cache?.industry || cache?.db_metadata?.targetIndustry || cache?.metadata?.targetIndustry || 'Tecnologia',
+        experienceLevel: cache?.db_metadata?.experienceLevel || cache?.metadata?.experienceLevel || 'Junior',
+        salaryExpectation: cache?.db_metadata?.salaryExpectation || cache?.metadata?.salaryExpectation || '',
+        preferredModality: cache?.db_metadata?.preferredModality || cache?.metadata?.preferredModality || 'Híbrido',
+        location: cache?.location || cache?.db_metadata?.location || cache?.metadata?.location || '',
+        whatsapp: cache?.db_metadata?.whatsapp || cache?.metadata?.whatsapp || '',
+        avatarUrl: cache?.db_avatar_url || cache?.avatar_url || '',
+        searchRadius: cache?.db_search_radius || cache?.search_radius || 50,
+        latitude: cache?.db_metadata?.location_lat || cache?.metadata?.location_lat || null as number | null,
+        longitude: cache?.db_metadata?.location_lng || cache?.metadata?.location_lng || null as number | null
     });
 
     useEffect(() => {
@@ -54,7 +73,7 @@ const CandidateOnboarding: React.FC<CandidateOnboardingProps> = ({ onComplete })
 
     const getCurrentLocation = () => {
         if (!navigator.geolocation) {
-            alert('Geolocalização não é suportada pelo seu navegador.');
+            showToast('Geolocalização não suportada.', 'warning');
             return;
         }
 
@@ -81,7 +100,7 @@ const CandidateOnboarding: React.FC<CandidateOnboardingProps> = ({ onComplete })
             },
             (error) => {
                 setLoading(false);
-                alert('Erro ao obter localização. Verifique as permissões do seu navegador.');
+                showToast('Erro ao obter localização. Verifique as permissões.', 'error');
             }
         );
     };
@@ -99,6 +118,7 @@ const CandidateOnboarding: React.FC<CandidateOnboardingProps> = ({ onComplete })
                 .maybeSingle();
 
             if (profile) {
+                setIsEditMode(!!profile.onboarding_completed);
                 const meta = profile.metadata || {};
                 setFormData({
                     fullName: profile.full_name || '',
@@ -156,6 +176,7 @@ const CandidateOnboarding: React.FC<CandidateOnboardingProps> = ({ onComplete })
             setFormData(prev => ({ ...prev, avatarUrl: publicUrl }));
         } catch (error: any) {
             console.error('Erro no upload:', error.message);
+            showToast('Falha no upload da foto.', 'error');
         } finally {
             setUploadingAvatar(false);
         }
@@ -206,19 +227,26 @@ const CandidateOnboarding: React.FC<CandidateOnboardingProps> = ({ onComplete })
 
             if (dbError) throw dbError;
 
+            showToast('Perfil ativado com sucesso!', 'success');
             onComplete();
         } catch (error: any) {
-            alert('Erro ao salvar perfil: ' + error.message);
+            console.error('Erro ao salvar perfil:', error);
+            showToast('Erro ao salvar perfil. Tente novamente.', 'error');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-secondary text-white relative overflow-hidden font-sans">
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full"></div>
-                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+        <div className="flex flex-col min-h-screen bg-[#0B0F1A] text-white relative overflow-hidden font-sans">
+            {/* AMBIENT BACKGROUND */}
+            <div className="absolute inset-0 pointer-events-none opacity-20">
+                <div className="absolute top-[10%] right-[-10%] w-[60%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full rotate-45" />
+                <div className="absolute bottom-[20%] left-[-10%] w-[50%] h-[50%] bg-primary/5 blur-[120px] rounded-full" />
+                <div className="absolute inset-0 opacity-[0.03]" style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill-rule='evenodd' stroke='%23ffffff' stroke-width='1' fill='none'/%3E%3C/svg%3E")`,
+                    backgroundSize: '30px 52px'
+                }} />
             </div>
 
             <div className="relative z-10 p-6 pt-10 flex flex-col max-w-sm mx-auto w-full h-full shrink-0">
@@ -275,8 +303,11 @@ const CandidateOnboarding: React.FC<CandidateOnboardingProps> = ({ onComplete })
                             </div>
 
                             {!isKeyboardOpen && (
-                                <button onClick={() => setStep(2)} className="w-full h-16 bg-primary text-secondary font-black rounded-2xl uppercase tracking-widest transition-all shadow-2xl shadow-primary/20 hide-when-short">
-                                    Continuar
+                                <button
+                                    onClick={() => isEditMode ? handleFinish() : setStep(2)}
+                                    className="w-full h-16 bg-primary text-secondary font-black rounded-2xl uppercase tracking-widest transition-all shadow-2xl shadow-primary/20 hide-when-short flex items-center justify-center gap-2"
+                                >
+                                    {isEditMode ? (loading ? <div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin" /> : <>Salvar Alterações <span className="material-symbols-outlined font-black">check</span></>) : 'Continuar'}
                                 </button>
                             )}
                         </div>
@@ -327,8 +358,11 @@ const CandidateOnboarding: React.FC<CandidateOnboardingProps> = ({ onComplete })
                                     <button onClick={() => setStep(1)} className="w-20 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white/40">
                                         <span className="material-symbols-outlined">arrow_back</span>
                                     </button>
-                                    <button onClick={() => setStep(3)} className="flex-1 h-16 bg-primary text-secondary font-black rounded-2xl uppercase tracking-widest transition-all shadow-2xl shadow-primary/20">
-                                        Próximo
+                                    <button
+                                        onClick={() => isEditMode ? handleFinish() : setStep(3)}
+                                        className="flex-1 h-16 bg-primary text-secondary font-black rounded-2xl uppercase tracking-widest transition-all shadow-2xl shadow-primary/20 flex items-center justify-center gap-2"
+                                    >
+                                        {isEditMode ? (loading ? <div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin" /> : <>Salvar Alterações <span className="material-symbols-outlined font-black">check</span></>) : 'Próximo'}
                                     </button>
                                 </div>
                             )}
@@ -373,8 +407,11 @@ const CandidateOnboarding: React.FC<CandidateOnboardingProps> = ({ onComplete })
                                     <button onClick={() => setStep(2)} className="w-20 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white/40">
                                         <span className="material-symbols-outlined">arrow_back</span>
                                     </button>
-                                    <button onClick={() => setStep(4)} className="flex-1 h-16 bg-primary text-secondary font-black rounded-2xl uppercase tracking-widest transition-all shadow-2xl shadow-primary/20">
-                                        Próximo
+                                    <button
+                                        onClick={() => isEditMode ? handleFinish() : setStep(4)}
+                                        className="flex-1 h-16 bg-primary text-secondary font-black rounded-2xl uppercase tracking-widest transition-all shadow-2xl shadow-primary/20 flex items-center justify-center gap-2"
+                                    >
+                                        {isEditMode ? (loading ? <div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin" /> : <>Salvar Alterações <span className="material-symbols-outlined font-black">check</span></>) : 'Próximo'}
                                     </button>
                                 </div>
                             )}

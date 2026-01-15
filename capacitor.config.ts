@@ -5,10 +5,13 @@ const config: CapacitorConfig = {
   appName: 'Jobee',
   webDir: 'dist',
   plugins: {
+    PushNotifications: {
+      presentationOptions: ["badge", "sound", "alert"],
+    },
     Keyboard: {
-      resize: 'body',
+      resize: 'body' as any,
       resizeOnFullScreen: true,
-      style: 'dark',
+      style: 'dark' as any,
     },
   },
 };

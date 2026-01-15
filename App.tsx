@@ -1,19 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Page } from './types';
-import LoginPage from './pages/LoginPage';
-import ResetPasswordPage from './pages/ResetPasswordPage';
-import JobsPage from './pages/JobsPage';
-import SwipePage from './pages/SwipePage';
-import MatchesPage from './pages/MatchesPage';
-import ChatPage from './pages/ChatPage';
-import ProfilePage from './pages/ProfilePage';
-import CandidatesPage from './pages/CandidatesPage';
-import RecruiterDashboard from './pages/RecruiterDashboard';
-import CandidateDashboard from './pages/CandidateDashboard';
-import RecruiterOnboarding from './pages/RecruiterOnboarding';
-import CandidateOnboarding from './pages/CandidateOnboarding';
-import CreateJobPage from './pages/CreateJobPage';
-import BrandPage from './pages/BrandPage';
 import BottomNav from './components/BottomNav';
 import { JobeeSymbol, JobeeSplashScreen } from './components/JobeeIdentity';
 import InstallPWAPrompt from './components/InstallPWAPrompt';
@@ -21,16 +7,39 @@ import { Match } from './types';
 import { MOCK_MATCHES } from './constants';
 import { supabase } from './services/supabaseClient';
 import { useSafePadding } from './hooks/useSafePadding';
+import { requestNativePermissions } from './services/nativePermissions';
+import { ToastProvider, useToast } from './context/ToastContext';
+import { useKeyboardStatus } from './hooks/useKeyboardStatus';
+
+// Lazy Load Pages to optimize initial bundle size
+const LoginPage = React.lazy(() => import('./pages/LoginPage'));
+const ResetPasswordPage = React.lazy(() => import('./pages/ResetPasswordPage'));
+const JobsPage = React.lazy(() => import('./pages/JobsPage'));
+const SwipePage = React.lazy(() => import('./pages/SwipePage'));
+const MatchesPage = React.lazy(() => import('./pages/MatchesPage'));
+const ChatPage = React.lazy(() => import('./pages/ChatPage'));
+const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
+const CandidatesPage = React.lazy(() => import('./pages/CandidatesPage'));
+const RecruiterDashboard = React.lazy(() => import('./pages/RecruiterDashboard'));
+const RecruiterMatchPage = React.lazy(() => import('./pages/RecruiterMatchPage'));
+const CandidateDashboard = React.lazy(() => import('./pages/CandidateDashboard'));
+const RecruiterOnboarding = React.lazy(() => import('./pages/RecruiterOnboarding'));
+const CandidateOnboarding = React.lazy(() => import('./pages/CandidateOnboarding'));
+const CreateJobPage = React.lazy(() => import('./pages/CreateJobPage'));
+const BrandPage = React.lazy(() => import('./pages/BrandPage'));
 
 const App: React.FC = () => {
   const mainPadding = useSafePadding({ basePadding: 6 });
+  const { isKeyboardOpen } = useKeyboardStatus();
   const [currentPage, setCurrentPage] = useState<Page>('login');
   const [matches, setMatches] = useState<Match[]>(MOCK_MATCHES);
   const [selectedMatchId, setSelectedMatchId] = useState<string>(MOCK_MATCHES[0].id);
   const [loadingAuth, setLoadingAuth] = useState(true);
   const [userRole, setUserRole] = useState<'candidate' | 'recruiter'>('candidate');
   const [isOnboardingCompleted, setIsOnboardingCompleted] = useState(false);
+  const [profile, setProfile] = useState<any>(null);
   const [showSplash, setShowSplash] = useState(true);
+  const { showToast } = useToast();
 
   // Flag to force onboarding for users who haven't completed it yet
   const shouldForceOnboarding = !isOnboardingCompleted;
@@ -47,7 +56,7 @@ const App: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('role, onboarding_completed')
+        .select('*')
         .eq('id', id)
         .single();
 
@@ -70,13 +79,40 @@ const App: React.FC = () => {
         setUserRole(data.role);
         setIsOnboardingCompleted(!!data.onboarding_completed);
 
+        // Construct optimized profile object
+        const profileInfo = {
+          id,
+          db_avatar_url: data.avatar_url,
+          db_full_name: data.full_name,
+          db_metadata: data.metadata,
+          db_company_name: data.company_name,
+          db_company_logo: data.company_logo_url,
+          db_company_color: data.metadata?.company_color || '#3B82F6',
+          db_subscription_status: data.subscription_status || 'free',
+          db_subscription_tier: data.subscription_tier || 'nectar',
+          db_search_radius: data.search_radius || 50,
+          db_skills: data.skills || []
+        };
+        setProfile(profileInfo);
+
         // Navigation logic based on database truth
         if (!data.onboarding_completed) {
           setCurrentPage('onboarding');
         } else {
           // If we are already on a main page, don't force redirect
           if (currentPage === 'login' || currentPage === 'onboarding') {
-            setCurrentPage(data.role === 'recruiter' ? 'jobs' : 'dashboard');
+            // Try to restore last session
+            const lastPage = localStorage.getItem('jobee_last_page') as Page;
+            const lastMatchId = localStorage.getItem('jobee_last_match_id');
+
+            if (lastPage && lastPage !== 'login' && lastPage !== 'reset-password') {
+              // Restore context if needed
+              if (lastPage === 'chat' && lastMatchId) setSelectedMatchId(lastMatchId);
+              setCurrentPage(lastPage);
+            } else {
+              // Default Fallback
+              setCurrentPage(data.role === 'recruiter' ? 'jobs' : 'dashboard');
+            }
           }
         }
       } else {
@@ -86,6 +122,7 @@ const App: React.FC = () => {
       }
     } catch (err) {
       console.error('Error fetching profile:', err);
+      showToast('Erro ao carregar perfil. Verifique sua conexão.', 'error');
     }
   };
 
@@ -111,6 +148,9 @@ const App: React.FC = () => {
       });
     });
 
+    // Request Native Permissions (Geolocation & Push Notifications)
+    requestNativePermissions();
+
     // Check for recovery flow first thing
     const isRecovery = window.location.hash.includes('type=recovery');
     if (isRecovery) {
@@ -123,10 +163,7 @@ const App: React.FC = () => {
         await fetchProfile(session.user.id, session.user.user_metadata?.role, session.user.user_metadata?.onboarding_completed);
       }
 
-      // Artificial delay to show the beautiful Splash Screen
-      setTimeout(() => {
-        setLoadingAuth(false);
-      }, 1500);
+      setLoadingAuth(false);
     });
 
     // Listen for auth state changes
@@ -146,6 +183,15 @@ const App: React.FC = () => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // PERSISTENCE: Save Navigation State
+  useEffect(() => {
+    // Only save "real" pages (not login/transition states)
+    if (currentPage !== 'login' && currentPage !== 'reset-password') {
+      localStorage.setItem('jobee_last_page', currentPage);
+      if (selectedMatchId) localStorage.setItem('jobee_last_match_id', selectedMatchId);
+    }
+  }, [currentPage, selectedMatchId]);
 
   // Handle splash cleanup
   useEffect(() => {
@@ -172,15 +218,21 @@ const App: React.FC = () => {
         userRole === 'recruiter' ? (
           <RecruiterOnboarding
             onComplete={() => {
+              const isEdit = localStorage.getItem('onboarding_start_step_active');
+              localStorage.removeItem('onboarding_start_step_active');
+              if (isEdit) localStorage.setItem('return_to_edit_menu', 'true');
               setIsOnboardingCompleted(true);
-              setCurrentPage('jobs');
+              setCurrentPage(isEdit ? 'profile' : 'jobs');
             }}
           />
         ) : (
           <CandidateOnboarding
             onComplete={() => {
+              const isEdit = localStorage.getItem('onboarding_start_step_active');
+              localStorage.removeItem('onboarding_start_step_active');
+              if (isEdit) localStorage.setItem('return_to_edit_menu', 'true');
               setIsOnboardingCompleted(true);
-              setCurrentPage('dashboard');
+              setCurrentPage(isEdit ? 'profile' : 'dashboard');
             }}
           />
         )
@@ -199,28 +251,36 @@ const App: React.FC = () => {
           userRole === 'recruiter' ? (
             <RecruiterOnboarding
               onComplete={() => {
+                const isEdit = localStorage.getItem('onboarding_start_step_active');
+                localStorage.removeItem('onboarding_start_step_active');
+                if (isEdit) localStorage.setItem('return_to_edit_menu', 'true');
                 setIsOnboardingCompleted(true);
-                setCurrentPage('jobs');
+                setCurrentPage(isEdit ? 'profile' : 'jobs');
               }}
             />
           ) : (
             <CandidateOnboarding
               onComplete={() => {
+                const isEdit = localStorage.getItem('onboarding_start_step_active');
+                localStorage.removeItem('onboarding_start_step_active');
+                if (isEdit) localStorage.setItem('return_to_edit_menu', 'true');
                 setIsOnboardingCompleted(true);
-                setCurrentPage('dashboard');
+                setCurrentPage(isEdit ? 'profile' : 'dashboard');
               }}
             />
           )
         );
       case 'dashboard':
-        return <CandidateDashboard
-          onNavigate={setCurrentPage}
-          onOpenChat={(m) => { setSelectedMatchId(m.id); setCurrentPage('chat'); }}
-        />;
+        return userRole === 'recruiter' ? null : (
+          <CandidateDashboard
+            onNavigate={setCurrentPage}
+            onOpenChat={(m) => { setSelectedMatchId(m.id); setCurrentPage('chat'); }}
+          />
+        );
       case 'jobs':
-        return userRole === 'recruiter' ? <RecruiterDashboard onNavigate={setCurrentPage} /> : <JobsPage />;
+        return userRole === 'recruiter' ? null : <JobsPage />;
       case 'candidates':
-        return <CandidatesPage />;
+        return userRole === 'recruiter' ? <RecruiterMatchPage onNavigate={setCurrentPage} /> : <CandidatesPage />;
       case 'swipe':
         return userRole === 'recruiter' ? <CreateJobPage onNavigate={setCurrentPage} /> : <SwipePage />;
       case 'matches':
@@ -243,7 +303,7 @@ const App: React.FC = () => {
           />
         );
       case 'profile':
-        return <ProfilePage role={userRole} onNavigate={setCurrentPage} />;
+        return <ProfilePage initialProfile={profile} role={userRole} onNavigate={setCurrentPage} />;
       case 'brand':
         return <BrandPage onBack={() => setCurrentPage('login')} />;
       default:
@@ -264,35 +324,66 @@ const App: React.FC = () => {
     return (
       <>
         <InstallPWAPrompt />
-        {renderPage()}
+        <main className="w-full h-full">
+          <Suspense fallback={<JobeeSplashScreen />}>
+            {renderPage()}
+          </Suspense>
+        </main>
       </>
     );
   }
 
   return (
-    <div className="flex flex-col h-screen max-w-md mx-auto overflow-hidden shadow-2xl relative bg-secondary transition-colors duration-500">
+    // "Mobile Frame" Simulator for Desktop View
+    <div className="bg-[#050505] min-h-screen w-full flex justify-center lg:items-center font-sans overflow-hidden">
+      <div className="w-full h-full min-h-[100dvh] lg:min-h-0 lg:h-[850px] lg:max-w-[430px] lg:rounded-[3rem] lg:border-[8px] lg:border-[#1a1a1a] shadow-2xl relative overflow-hidden bg-[#0B0F1A] flex flex-col">
 
-      {/* GLOBAL BACKGROUND TEXTURE */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-        {/* Ambient Glow */}
-        <div className={`absolute top-[-10%] left-[-10%] w-[50%] h-[50%] blur-[120px] rounded-full transition-colors duration-1000 ${userRole === 'recruiter' ? 'bg-blue-500/10' : 'bg-primary/5'}`}></div>
-        <div className={`absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] blur-[120px] rounded-full transition-colors duration-1000 ${userRole === 'recruiter' ? 'bg-blue-500/5' : 'bg-primary/10'}`}></div>
+        {/* Safe Area Top (Status Bar Simulation) - Only visible inside the frame */}
+        <div className="absolute top-0 left-0 right-0 h-[env(safe-area-inset-top)] z-[9999] pointer-events-none" />
+
+        {/* GLOBAL BACKGROUND TEXTURE */}
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+          {/* Ambient Glow */}
+          <div className={`absolute top-[-10%] left-[-10%] w-[50%] h-[50%] blur-[120px] rounded-full transition-colors duration-1000 ${userRole === 'recruiter' ? 'bg-blue-500/10' : 'bg-primary/5'}`}></div>
+          <div className={`absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] blur-[120px] rounded-full transition-colors duration-1000 ${userRole === 'recruiter' ? 'bg-blue-500/5' : 'bg-primary/10'}`}></div>
+        </div>
+
+        <main
+          className={`flex-1 overflow-hidden relative z-10 h-full flex flex-col`}
+          style={{ paddingBottom: currentPage === 'chat' ? '0px' : mainPadding }}
+        >
+          <Suspense fallback={<JobeeSplashScreen />}>
+            {/* Recruiter Background Dashboard Persistence */}
+            {userRole === 'recruiter' && (
+              <div className={`absolute inset-0 ${(currentPage === 'dashboard' || currentPage === 'jobs' || currentPage === 'candidates' || (currentPage === 'swipe' && !isKeyboardOpen)) ? 'block' : 'hidden'} ${['dashboard', 'jobs'].includes(currentPage) ? 'z-20' : 'z-0'}`}>
+                <RecruiterDashboard
+                  onNavigate={setCurrentPage}
+                  initialView={currentPage === 'jobs' || currentPage === 'candidates' || currentPage === 'swipe' ? 'jobs_list' : 'overview'}
+                />
+              </div>
+            )}
+
+            {/* Overlays or Other Pages */}
+            <div className={`relative h-full flex flex-col ${['dashboard', 'jobs'].includes(currentPage) && userRole === 'recruiter' ? 'pointer-events-none opacity-0' : 'z-30'}`}>
+              {renderPage()}
+            </div>
+          </Suspense>
+        </main>
+
+        {(!shouldForceOnboarding && currentPage !== 'chat') && (
+          <BottomNav activePage={currentPage} onNavigate={setCurrentPage} role={userRole} />
+        )}
+
+        <InstallPWAPrompt />
+        {showSplash && <JobeeSplashScreen isExiting={!loadingAuth} />}
       </div>
-
-      <main
-        className={`flex-1 overflow-hidden relative z-10 h-full flex flex-col`}
-        style={{ paddingBottom: currentPage === 'chat' ? '0px' : mainPadding }}
-      >
-        {renderPage()}
-      </main>
-      {(!shouldForceOnboarding && currentPage !== 'chat') && (
-        <BottomNav activePage={currentPage} onNavigate={setCurrentPage} role={userRole} />
-      )}
-      <InstallPWAPrompt />
-      {showSplash && <JobeeSplashScreen isExiting={!loadingAuth} />}
     </div>
   );
 };
 
-export default App;
+export default () => (
+  <ToastProvider>
+    <App />
+  </ToastProvider>
+);

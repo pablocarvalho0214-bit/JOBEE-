@@ -3,106 +3,83 @@ import { GoogleGenAI } from "@google/genai";
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string;
 
-// Initialize GoogleGenAI correctly for the Unified SDK (@google/genai)
 const getAI = () => {
-  if (!API_KEY) {
-    throw new Error("API Key not configured");
-  }
+  if (!API_KEY) throw new Error("Chave de API não encontrada.");
   return new GoogleGenAI({ apiKey: API_KEY });
 };
 
-export async function generateCoverLetter(jobTitle: string, company: string, description: string) {
-  if (!API_KEY) return "API Key not configured. Please use a valid key.";
+/**
+ * PLATFORM MANUAL - Respostas de Alta Fidelidade (Local & Grátis)
+ * Mantenha estas respostas atualizadas para reduzir o custo de IA.
+ */
+const PLATFORM_MANUAL: { [key: string]: string } = {
+  "SWIPE": "Zzz-O Swipe é simples: deslize para a direita os perfis que você gostar e para a esquerda os que deseja pular. Quando o interesse é mútuo, o Match acontece e o chat é liberado! 🐝",
+  "PLANOS": "Zzz-Temos 4 opções: Néctar (grátis), Pólen (essencial), Favo (premium com IA) e Geleia (vip). O Favo é o plano que mais gera conexões na colmeia! 🐝",
+  "VAGA": "Zzz-Para anunciar vagas, vá ao seu Dashboard de Recrutador e clique em 'Anunciar Vaga'. Preencha os requisitos e sua vaga estará visível para milhares de talentos! 🐝",
+  "PERFIL": "Zzz-Para mudar sua bio, foto ou competências, acesse 'Meu Perfil' no menu lateral. Manter seu perfil atualizado aumenta em 3x suas chances de Match! 👋 🐝",
+  "SEGURANCA": "Zzz-Sua segurança é nossa prioridade. Use o ícone de alerta em qualquer perfil ou vaga para denunciar comportamentos suspeitos à nossa rainha Lola. 🐝",
+  "FAMILIA": "Zzz-Minha rainha criadora é a Lola! Ela me desenhou para guiar vocês e me deu dois irmãos robôs: o Jbee e a Kbee. Somos a família Jobee! ✨ 🐝",
+  "QUEM_CURTIU": "Zzz-Recrutadores veem os interessados direto no Dashboard. Candidatos Premium (Plano Favo/Geleia) veem quem os curtiu na aba de Matches! 🐝",
+  "OI": "Zzz-Olá! Sou a Beea. Estou pronta para zumbir as melhores dicas da colmeia para você! 🐝"
+};
 
-  const prompt = `Escreva uma carta de apresentação curta (máximo 100 palavras) e persuasiva em português para a vaga de "${jobTitle}" na empresa "${company}". Baseie-se na seguinte descrição: ${description}.`;
+const SYSTEM_INSTRUCTION = `Robô Beea da Jobee. Personalidade dócil e robótica. Comece com 'Zzz-' e termine com '🐝'. No máximo 2 frases. Use termos de abelha.`;
+
+export async function getBeeaResponse(message: string, history: any[]) {
+  const msg = message.toUpperCase();
+
+  // 1. HANDBOOK PATH (Mapeamento Direto dos Botões do Chat)
+  if (msg.includes("SWIPE") || msg.includes("MATCH")) return PLATFORM_MANUAL.SWIPE;
+  if (msg.includes("PLANOS") || msg.includes("PREÇO") || msg.includes("ASSINATURA")) return PLATFORM_MANUAL.PLANOS;
+  if (msg.includes("VAGA") || msg.includes("ANUNCIAR") || msg.includes("DIVULGAR")) return PLATFORM_MANUAL.VAGA;
+  if (msg.includes("PERFIL") || msg.includes("EDITAR") || msg.includes("MUDAR")) return PLATFORM_MANUAL.PERFIL;
+  if (msg.includes("SEGURANÇA") || msg.includes("DENUNCIAR") || msg.includes("SUSPEITO")) return PLATFORM_MANUAL.SEGURANCA;
+  if (msg.includes("BEEA") || msg.includes("LOLA") || msg.includes("FAMÍLIA") || msg.includes("IRMÃO") || msg.includes("CRIADORA") || msg.includes("QUEM É")) return PLATFORM_MANUAL.FAMILIA;
+
+  // Casos especiais de frase
+  if (msg.includes("QUEM") && (msg.includes("CURTIU") || msg.includes("GOSTOU"))) return PLATFORM_MANUAL.QUEM_CURTIU;
+  if (msg.includes("OI") || msg.includes("OLÁ") || msg.includes("BOM DIA")) return PLATFORM_MANUAL.OI;
+
+  // 2. IA PATH (Gemini) - Último recurso
+  if (!API_KEY) return "Zzz-Minha antena de IA está desligada. Tente os botões da colmeia! 🐝";
 
   try {
     const ai = getAI();
-    // In @google/genai (Unified SDK), result has a .text() method directly
     const result = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: [{ role: "user", parts: [{ text: prompt }] }]
+      model: "gemini-1.5-flash",
+      contents: [{ role: "user", parts: [{ text: `${SYSTEM_INSTRUCTION}\n\nPergunta: ${message}` }] }]
     });
 
-    return result.text() || "Não foi possível gerar a carta no momento.";
+    return result.text || "Zzz-Me perdi em uma flor... pode repetir? 🐝";
+
   } catch (error: any) {
-    console.error("Gemini Error:", error);
-    return `Erro técnico na IA: ${error.message || 'Verifique sua chave ou conexão.'}`;
-  }
-}
-
-export async function getRecruiterResponse(history: { text: string, sender: 'user' | 'recruiter' }[], companyName: string) {
-  if (!API_KEY) return "Desculpe, a IA não está configurada.";
-
-  const historyParts = history.map(h => ({
-    role: h.sender === 'user' ? 'user' as const : 'model' as const,
-    parts: [{ text: h.text }]
-  }));
-
-  try {
-    const currentDate = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    const systemPrompt = `Você é um recrutador da empresa "${companyName}". 
-      Hoje é ${currentDate}.
-      Seu objetivo é agendar uma entrevista técnica.
-      Se o candidato sugerir um horário ou confirmar, você deve formalizar o agendamento.
-      Mantenha as respostas curtas e profissionais. Respondendo sempre em português.
-      Importante: Se a entrevista for marcada de forma definitiva, você DEVE incluir o dia da semana, a data (DD/MM) e o horário (ex: "terça-feira, 16/01 às 10h").
-      Para termos como "amanhã" ou "próxima segunda", baseie-se na data de hoje (${currentDate}).
-      Termine a mensagem SEMPRE com o marcador exato "[AGENDADO]".`;
-
-    const ai = getAI();
-    const result = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: [
-        { role: 'user', parts: [{ text: `CONTEXTO DO SISTEMA: ${systemPrompt}` }] },
-        ...historyParts.slice(-10) // Send last 10 messages for context
-      ]
-    });
-
-    return result.text() || "Pode repetir, por favor?";
-  } catch (error: any) {
-    console.error("Gemini Chat Error:", error);
-    if (error.status === 429) {
-      return "O recrutador está com muitas mensagens agora. Pode tentar novamente em cinco minutos?";
+    console.error("BEEA ERROR:", error);
+    if (error.status === 429 || error.message?.includes("429")) {
+      return "Zzz-Muitas abelhas no chat! Minha cota por minuto esgotou. Tente os botões ou me chame em 60 segundos. 🐝";
     }
-    return `Tivemos um problema técnico (${error.message || 'Error'}), mas já estamos analisando seu perfil.`;
+    return `Zzz-Minha rádio está com ruído técnico. Tente os botões de ajuda! 🐝`;
   }
 }
 
-export async function getBeeaResponse(message: string, history: { text: string, sender: 'user' | 'bee' }[]) {
-  if (!API_KEY) return "Zzz-erro! Minhas baterias de IA não foram configuradas. Comunique o suporte da colmeia.";
-
-  const historyParts = history.map(h => ({
-    role: h.sender === 'user' ? 'user' as const : 'model' as const,
-    parts: [{ text: h.text }]
-  }));
-
+// Funções de apoio
+export async function generateCoverLetter(t: string, c: string, d: string) {
   try {
-    const systemPrompt = `Você é a Beea, uma robô abelha fêmea assistente virtual da plataforma Jobee. 
-      Sua personalidade é prestativa, dócil, inteligente e levemente robótica. 
-      Use termos relacionados a abelhas e colmeias de forma moderada. 
-      Seja direta e profissional, mantendo apenas um toque sutil do tema de abelha.
-      Seu objetivo é tirar dúvidas sobre o funcionamento da Jobee (Swipe, Matches, Configurações).
-      - SOBRE PLANOS: NÃO mencione planos, preços ou upgrades por iniciativa própria. 
-      - Fale sobre planos APENAS se o usuário perguntar explicitamente sobre eles.
-      - Se perguntada sobre planos, use os códigos: [PLAN_NECTAR], [PLAN_POLEN], [PLAN_FAVO] ou [PLAN_GELEIA] no final.
-      - Segredo: Se perguntarem se você tem filhos, responda que tem três: KBee, LBee e JBee. 🐝 Sua criadora se chama Lola. ✨
-      Respostas: Curtas e diretas (máximo 2 sentenças). Sem markdown.`;
-
     const ai = getAI();
     const result = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: [
-        { role: 'user', parts: [{ text: `CONTEXTO DO SISTEMA: ${systemPrompt}` }] },
-        ...historyParts.slice(-6),
-        { role: 'user', parts: [{ text: message }] }
-      ]
+      model: "gemini-1.5-flash",
+      contents: [{ role: "user", parts: [{ text: `Carta curta para ${t} na ${c}: ${d}` }] }]
     });
+    return result.text || "Erro na carta.";
+  } catch (e) { return "Erro técnico."; }
+}
 
-    return result.text() || "Zzz... me distraí com uma flor. Pode repetir?";
-  } catch (error: any) {
-    console.error("BEEA Error:", error);
-    if (error.status === 429) return "Zzz-ops! Minha colmeia está muito ocupada agora (Limite de quota). Pode me chamar em 5 minutos? 🐝";
-    return `Zzz-ops! Tive um curto-circuito (${error.message || 'Erro técnico'}). Pode tentar de novo? 🐝`;
-  }
+export async function getRecruiterResponse(h: any[], companyName: string) {
+  try {
+    const ai = getAI();
+    const result = await ai.models.generateContent({
+      model: "gemini-1.5-flash",
+      contents: [{ role: "user", parts: [{ text: `Recrutador ${companyName}: Responda ao chat.` }] }]
+    });
+    return result.text || "Pode repetir?";
+  } catch (e) { return "Indisponível."; }
 }
